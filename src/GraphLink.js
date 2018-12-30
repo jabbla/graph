@@ -1,4 +1,4 @@
-import GraphNode from './GraphNode';
+import { GraphNodeCreator } from './GraphNode';
 
 const linkMap = {};
 
@@ -7,26 +7,33 @@ class GraphLink {
         let { source, target } = linkOption;
         let id = `${source}#!#@#${target}`;
 
-        if(linkMap[id]){
-            return linkMap[id];
-        }
-
         this.linkOption = linkOption;
         this.id = id;;
-
-        linkMap[this.id] = this;
 
         this.sourceNode = this.buildNode('source', linkOption.source, options.nodes);
         this.targetNode = this.buildNode('target', linkOption.target, options.nodes);
     }
     buildNode(type, nodeId, nodes){
         const { id } = this;
-        let node = new GraphNode(nodes.find(node => node.id === nodeId));
+        let nodeRes = GraphNodeCreator.create(nodes.find(node => node.id === nodeId));
+    
+        nodeRes.node.addLink(type, this);
         
-        node.addLink(type, this);
-        node.build();
-        return node;
+        return nodeRes.node;
     }
 };
 
-export default GraphLink;
+export const GraphLinkCreator = {
+    create(linkOption, options){
+        let { source, target } = linkOption;
+        let id = `${source}#!#@#${target}`;
+        let exist = !!linkMap[id];
+        let link = linkMap[id] || new GraphLink(linkOption, options);
+
+        if(exist){
+            linkMap[id] = link;
+        }
+
+        return {exist, link};
+    }
+};
