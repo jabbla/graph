@@ -1,6 +1,7 @@
 import LayoutNode from './LayoutNode';
 import LayoutLink from './LayoutLink';
 import SVGPanZoom from '../lib/SVGPanZoom';
+import ToolTip from './ToolTip';
 import {
     createSvgElement,
     setSvgAttribute,
@@ -147,7 +148,32 @@ class Layout {
     }
     render(){
         this.renderNodes();
+        this.addEventListeners();
+        this.createToolBox();
         SVGPanZoom('#viewport');
+    }
+    addEventListeners(){
+        let svgDom = document.querySelector('#viewport');
+        
+        /**hover tooltip */
+        [...svgDom.querySelectorAll('.nodeWraper')].forEach(nodeWraper => {
+            let tooltip = new ToolTip();
+            let nodeRect = nodeWraper.querySelector('.nodeRect');
+
+            nodeWraper.addEventListener('mouseenter', () => {
+                let { name } = nodeWraper.dataset;
+                let { left, top } = nodeRect.getBoundingClientRect();
+                
+                tooltip.show({ left, top, text: name });
+            });
+
+            nodeWraper.addEventListener('mouseleave', () => {
+                tooltip.hide();
+            });
+        });
+    }
+    createToolBox(){
+
     }
 }
 
