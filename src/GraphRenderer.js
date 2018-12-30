@@ -1,4 +1,5 @@
 import {GraphLinkCreator} from './GraphLink';
+import GraphNode from './GraphNode';
 import Layout from './Layout';
 
 class GraphRenderer {
@@ -19,8 +20,13 @@ class GraphRenderer {
         if(!nodes.length || !links.length){
             return;
         }
-
+        
+        this.reset();
         this.build(renderOptions);
+    }
+    reset(){
+        GraphNode.nodeMap = {};
+        Layout.layoutNodeMap = {};
     }
     build(renderOptions){
         const { nodes, links } = renderOptions;

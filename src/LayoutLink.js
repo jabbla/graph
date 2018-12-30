@@ -1,7 +1,5 @@
 import { createSvgElement, setSvgAttributes, setElemStyle } from "./dom";
 
-let linkMap = {};
-
 class LayoutLink {
     constructor(graphLink){
         this.graphLink = graphLink;
