@@ -1,14 +1,12 @@
 import LayoutNode from './LayoutNode';
 import LayoutLink from './LayoutLink';
-import SVGPanZoom from '../lib/svg-pan-zoom';
+import SVGPanZoom from '../lib/SVGPanZoom';
 import {
     createSvgElement,
     setSvgAttribute,
     setSvgAttributes,
     setElemStyle
 } from './dom';
-
-const layoutNodeMap = {};
 
 class Layout {
     constructor({matrix, initOptions}){
@@ -19,6 +17,7 @@ class Layout {
             rowHeight: 35,
             columnGap: 20
         };
+        Layout.layoutNodeMap = {};
         this.layoutMatrix = [];
         this.init();
     }
@@ -59,7 +58,7 @@ class Layout {
                     top: rowTop,
                     left
                 });
-                layoutNodeMap[graphNode.id] = layoutNode;
+                Layout.layoutNodeMap[graphNode.id] = layoutNode;
                 layoutRow.push(layoutNode);
                 currentLeft += (layoutNode.getWidth() + columnGap);
             }
@@ -143,7 +142,7 @@ class Layout {
 
         source.forEach(graphLink => {
             let layoutLink = new LayoutLink(graphLink);
-            linksWraper.appendChild(layoutLink.createElement(layoutNodeMap));
+            linksWraper.appendChild(layoutLink.createElement(Layout.layoutNodeMap));
         });
     }
     render(){
@@ -151,5 +150,7 @@ class Layout {
         SVGPanZoom('#viewport');
     }
 }
+
+Layout.layoutNodeMap = {};
 
 export default Layout;

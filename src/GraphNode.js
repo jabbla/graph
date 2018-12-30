@@ -1,12 +1,3 @@
-import {
-    createSvgElement,
-    setSvgAttribute,
-    setSvgAttributes,
-    setElemStyle
-} from './dom';
-
-const nodeMap = {};
-
 class GraphNode {
     constructor(nodeOption){
         this.id = nodeOption.id;
@@ -36,14 +27,17 @@ class GraphNode {
     }
 };
 
+GraphNode.nodeMap = {};
+export default GraphNode;
+
 export const GraphNodeCreator = {
     create(nodeOption){
         let { id } = nodeOption;
-        let exist = !!nodeMap[id];
-        let node = nodeMap[id] || new GraphNode(nodeOption);
+        let exist = !!GraphNode.nodeMap[id];
+        let node = GraphNode.nodeMap[id] || new GraphNode(nodeOption);
 
         if(!exist){
-            nodeMap[id] = node;
+            GraphNode.nodeMap[id] = node;
         }
 
         return {exist, node};
