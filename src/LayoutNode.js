@@ -55,11 +55,14 @@ class LayoutNode {
     }
     createWraper(){
         const { width, height, rx, ry } = this.defaultConfig
-        const { id } = this.graphNode;
+        const { id, name } = this.graphNode;
 
         let nodeWraper = createSvgElement('g');
         setSvgAttributes(nodeWraper, {
-            id, width, height, rx, ry
+            id: `nodeWraper_${id}`,
+            class: 'nodeWraper',
+            'data-name': name,
+            width, height, rx, ry
         });
 
         return nodeWraper;
@@ -70,7 +73,8 @@ class LayoutNode {
 
         let nodeRect = createSvgElement('rect');
         setSvgAttributes(nodeRect, {
-            width, height, x, y, rx, ry
+            width, height, x, y, rx, ry,
+            class: 'nodeRect'
         });
         setElemStyle(nodeRect, {
             stroke: '#999',
