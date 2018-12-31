@@ -36,8 +36,8 @@ var nodes = [
 ];
 var links2 = [
     {
-        source: 'a1',
-        target: 'd'
+        source: 'd',
+        target: 'a1'
     },
     {
         source: 'a2',
@@ -86,8 +86,8 @@ renderer.render({
     },
     node: {
         icon: {
-            id: 'spark_icon',
-            color: '#d9b70a'
+            id: 'sql_icon',
+            //color: '#dc254c'
         }
     },
     nodes,

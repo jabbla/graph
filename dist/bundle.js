@@ -200,6 +200,7 @@ const symbols = [
     {
         type: 'icon',
         id: 'sql_icon',
+        color: '#dc254c',
         create(){
             let symbol = createSvgElement('symbol');
             let title = createSvgElement('title');
@@ -253,6 +254,7 @@ const symbols = [
     {
         type: 'icon',
         id: 'spark_icon',
+        color: '#d9b70a',
         create(){
             let symbol = createSvgElement('symbol');
             let title = createSvgElement('title');
@@ -335,7 +337,7 @@ const symbols = [
 ];
 
 const IconMap = symbols.filter(symbol => symbol.type === 'icon').reduce((prev, icon) => {
-    prev[icon.id] = true;
+    prev[icon.id] = icon;
     return prev;
 }, {});
 
@@ -373,7 +375,7 @@ class LayoutNode {
         nodeWraper.appendChild(nodeRect);
         nodeWraper.appendChild(nodeText);
         
-        if(IconMap[nodeConfig.icon.id]){
+        if(IconMap[nodeConfig.icon && nodeConfig.icon.id]){
             let nodeIcon = this.createIcon(nodeConfig.icon);
             nodeWraper.appendChild(nodeIcon);
         }
@@ -410,7 +412,7 @@ class LayoutNode {
         });
 
         setElemStyle(use, {
-            fill: icon.color
+            fill: icon.color || IconMap[icon.id].color
         });
 
         return use;
@@ -846,6 +848,9 @@ class GraphRenderer {
                 gap: 20
             },
             node: {
+                icon: {
+                    id: 'spark_icon'
+                },
                 formatter(node){
                     return textEllipsis(node.name, 20);
                 }
