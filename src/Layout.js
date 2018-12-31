@@ -13,22 +13,21 @@ class Layout {
     constructor({matrix, initOptions}){
         this.matrix = matrix;
         this.initOptions = initOptions;
-        this.defaultConfig = {
-            rowGap: 70,
-            rowHeight: 35,
-            columnGap: 20
-        };
+        
         Layout.layoutNodeMap = {};
         this.layoutMatrix = [];
         this.init();
     }
     init(){
-        let { width, height, el } = this.initOptions;
+        let { width, height, el, backgroundColor } = this.initOptions;
 
         this.svgCanvas = createSvgElement('svg');
         setSvgAttributes(this.svgCanvas, {
             width, height,
             id: 'viewport'
+        });
+        setElemStyle(this.svgCanvas, {
+            backgroundColor
         });
 
         let topAnchor = this.createTopAnchorSymbol();
@@ -38,9 +37,10 @@ class Layout {
 
         this.rootElement = document.querySelector(el);
     }
-    build(){
+    build({rowConfig, columnConfig, node}){
         const { matrix, layoutMatrix } = this;
-        const { rowGap, rowHeight, columnGap } = this.defaultConfig;
+        const { gap: rowGap, height: rowHeight } = rowConfig;
+        const { gap: columnGap } = columnConfig;
 
         let currentTop = 0; //current row top
 
@@ -53,15 +53,19 @@ class Layout {
             for(let j = 0; j < row.length; j++){
                 let graphNode = row[j];
                 let left = currentLeft;
-                let layoutNode = this.buildNode(graphNode, {
-                    rowIndex: i,
-                    columnIndex: j,
-                    top: rowTop,
-                    left
+                let buildRes = this.buildNode(graphNode, {
+                    i,
+                    j,
+                    rowTop,
+                    currentLeft,
+                    columnGap,
+                    node
                 });
+                let layoutNode = buildRes.layoutNode;
+
+                currentLeft = buildRes.currentLeft;
                 Layout.layoutNodeMap[graphNode.id] = layoutNode;
                 layoutRow.push(layoutNode);
-                currentLeft += (layoutNode.getWidth() + columnGap);
             }
             /**if align-center update node left */
             this.setRowContentCenter(layoutRow, currentLeft - columnGap);
@@ -71,9 +75,28 @@ class Layout {
         }
         this.layoutMatrix = layoutMatrix;
     }
-    buildNode(graphNode, info){
-        
-        return new LayoutNode(graphNode, info);
+    buildNode(graphNode, {i, j, rowTop, currentLeft, columnGap, node}){
+        let rowIndex = i;
+        let columnIndex = j;
+        let top = rowTop;
+        let left = currentLeft;
+        let parentLeftSum = 0;
+        let targetLinks = graphNode.links.target;
+
+        targetLinks.forEach(link => {
+            parentLeftSum += link.sourceNode.layoutNode.getLeft();
+        });
+        //left = (parentLeftSum / targetLinks.length) || 0;
+        let layoutNode = graphNode.setLayoutNode(new LayoutNode(graphNode, {
+            rowIndex, columnIndex, top, left
+        }, node));
+
+        currentLeft += (layoutNode.getWidth() + columnGap);
+
+        return {
+            layoutNode,
+            currentLeft
+        };
     }
     setRowContentCenter(layoutRow, sumWidth){
         const { svgCanvas, rootElement } = this;
@@ -149,31 +172,48 @@ class Layout {
     render(){
         this.renderNodes();
         this.addEventListeners();
-        this.createToolBox();
-        SVGPanZoom('#viewport');
+        this.setSVGPanZoom();
     }
     addEventListeners(){
         let svgDom = document.querySelector('#viewport');
         
-        /**hover tooltip */
+        /** node tooltip */
         [...svgDom.querySelectorAll('.nodeWraper')].forEach(nodeWraper => {
-            let tooltip = new ToolTip();
+            let tooltip = new ToolTip('node');
             let nodeRect = nodeWraper.querySelector('.nodeRect');
 
             nodeWraper.addEventListener('mouseenter', () => {
                 let { name } = nodeWraper.dataset;
-                let { left, top } = nodeRect.getBoundingClientRect();
+                let { left, top, width } = nodeRect.getBoundingClientRect();
                 
-                tooltip.show({ left, top, text: name });
+                tooltip.show({ left, top, text: name, dx: width/2 });
             });
 
             nodeWraper.addEventListener('mouseleave', () => {
                 tooltip.hide();
             });
         });
-    }
-    createToolBox(){
 
+        /** link tooltip */
+        [...svgDom.querySelectorAll('.nodeLink')].forEach(nodeLink => {
+            let tooltip = new ToolTip('link');
+            
+            nodeLink.addEventListener('mouseenter', (e) => {
+                tooltip.show({ 
+                    left: e.clientX,
+                    top: e.clientY,
+                    text: `${nodeLink.dataset.source} --> ${nodeLink.dataset.target}`
+                });
+            });
+
+            nodeLink.addEventListener('mouseleave', () => {
+                tooltip.hide();
+            });
+        });
+    }
+    setSVGPanZoom(){
+        const { svgPanZoomConfig } = this.initOptions;
+        SVGPanZoom('#viewport', svgPanZoomConfig);
     }
 }
 

@@ -7,9 +7,10 @@ import {
 import layoutLink from './LayoutLink';
 
 class LayoutNode {
-    constructor(graphNode, info){
+    constructor(graphNode, info, globalNodeConfig){
         this.graphNode = graphNode;
         this.info = info;
+        this.globalNodeConfig = globalNodeConfig;
 
         this.defaultConfig = {
             width: 200,
@@ -22,6 +23,9 @@ class LayoutNode {
     }
     getWidth(){
         return this.defaultConfig.width;
+    }
+    getLeft(){
+        return this.info.left;
     }
     addLeft(add){
         this.info.left += add;
@@ -87,8 +91,9 @@ class LayoutNode {
         return nodeRect;
     }
     createText(){
+        const { graphNode } = this;
         const { top: y, left: x } = this.info;
-        const { name } = this.graphNode;
+        const nodeConfig = {...this.globalNodeConfig, ...graphNode.nodeOptions};
 
         let nodeText = createSvgElement('text');
         let textX = x + 54,
@@ -104,7 +109,7 @@ class LayoutNode {
         setElemStyle(nodeText, {
             fill: '#333'
         });
-        nodeText.innerHTML = name;
+        nodeText.innerHTML = nodeConfig.formatter(graphNode);
 
         return nodeText;
     }

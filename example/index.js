@@ -7,11 +7,11 @@ var renderer = Graph.init({
 var nodes = [
     {
         id: 'a',
-        name: 'a'
+        name: '一二二二二二二二二二'
     },
     {
         id: 'a1',
-        name: 'a1'
+        name: 'a1',
     },
     {
         id: 'a2',
@@ -81,11 +81,17 @@ var links1 = [
 ];
 
 renderer.render({
+    linkConfig: {
+        linkType: 'line'
+    },
     nodes,
     links: links1
 });
 document.querySelector('#button').onclick = function(){
     renderer.render({
+        linkConfig: {
+            linkType: 'curve'
+        },
         nodes,
         links: links2
     });
