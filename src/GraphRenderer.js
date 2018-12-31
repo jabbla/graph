@@ -1,38 +1,77 @@
 import {GraphLinkCreator} from './GraphLink';
 import GraphNode from './GraphNode';
 import Layout from './Layout';
+import { textEllipsis } from './utils';
 
 class GraphRenderer {
     constructor(initOptions = {}){
-        this.initOptions = this.mergeOptions(initOptions);
+        this.initOptions = this.mergeInitOptions(initOptions);
     }
-    mergeOptions(initOptions){
+    mergeInitOptions(initOptions){
         let defaultOptions = {
             width: '100%',
-            height: '100%'
+            height: '100%',
+            backgroundColor: 'transparent',
+            svgPanZoomConfig: {
+                controlIconsEnabled: true
+            }
+        };
+        let res = {
+            svgPanZoomConfig: {...defaultOptions.svgPanZoomConfig, ...initOptions.svgPanZoomConfig}
         };
         
-        return Object.assign(defaultOptions, initOptions);
+        return Object.assign(defaultOptions, initOptions, res);
+    }
+    mergeRenderOptions(renderOptions){
+        let { nodes, links } = renderOptions;
+        let defaultOptions = {
+            linkConfig: {
+                linkType: 'curve'
+            },
+            rowConfig: {
+                gap: 100,
+                height: 35
+            },
+            columnConfig: {
+                gap: 20
+            },
+            node: {
+                formatter(node){
+                    return textEllipsis(node.name, 18);
+                }
+            }
+        };
+
+        return this.renderOptions = {
+            linkConfig: {...defaultOptions.linkConfig, ...renderOptions.linkConfig},
+            rowConfig: {...defaultOptions.rowConfig, ...renderOptions.rowConfig},
+            columnConfig: {...defaultOptions.columnConfig, ...renderOptions.columnConfig},
+            nodes, links,
+            node: {...defaultOptions.node, ...renderOptions.node}
+        }
     }
     render(renderOptions = {}){
-        const { nodes, links } = renderOptions;
+        const { nodes, links } = this.mergeRenderOptions(renderOptions);
 
         if(!nodes.length || !links.length){
             return;
         }
         
         this.reset();
-        this.build(renderOptions);
+        this.build(this.renderOptions);
     }
     reset(){
         GraphNode.nodeMap = {};
         Layout.layoutNodeMap = {};
     }
     build(renderOptions){
-        const { nodes, links } = renderOptions;
+        const { 
+            nodes, links, linkConfig, rowConfig, columnConfig,
+            node
+        } = renderOptions;
 
         let GraphLinks = links.reduce((prev, cur) => {
-            let { exist, link } = GraphLinkCreator.create(cur, {nodes});
+            let { exist, link } = GraphLinkCreator.create(cur, {nodes, linkConfig});
 
             if(!exist){
                 prev.push(link);
@@ -54,6 +93,7 @@ class GraphRenderer {
         /**layout */
         let layout = this.layout(rootNodes);
 
+        layout.build({rowConfig, columnConfig, node});
         layout.render();
     }
     layout(rootNodes){
@@ -71,7 +111,6 @@ class GraphRenderer {
 
         /**create layout with matrix */
         let layout = new Layout({matrix, initOptions: this.initOptions});
-        let layoutMatrix = layout.build();
 
         return layout;
     }

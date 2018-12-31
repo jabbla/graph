@@ -15,8 +15,6 @@
 ```
 
 ### 格式化内容
-格式化节点内容，内容通过innerHTML插入，可返回HTML字符串
-
 优先应用节点自身的``formatter``，其次全局``formatter``
 ```js
 {

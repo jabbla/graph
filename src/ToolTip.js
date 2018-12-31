@@ -1,7 +1,8 @@
 import { setElemStyle } from "./dom";
 
 class ToolTip {
-    constructor(){
+    constructor(type){
+        this.type = type;
         this.init();
     }
     init(){
@@ -26,6 +27,7 @@ class ToolTip {
             backgroundColor: '#3d3d3d',
             color: '#fff',
             height: '24px',
+            whiteSpace: 'nowrap',
             lineHeight: '24px',
             transform: 'translateX(-50%)',
             padding: '0 10px',
@@ -35,13 +37,17 @@ class ToolTip {
         this.elem.appendChild(this.arrow);
         this.elem.appendChild(this.content);
     }
-    show({ left, top, text }){
+    show({ left, top, text, dx }){
+        dx = dx || 0;
+        const { type } = this;
+
+        let transform = type === 'node'? `translate(${dx}px, -100%)`:'translateY(-100%)';
         setElemStyle(this.elem, {
             position: 'fixed',
             zIndex: 1500,
             left: left + 'px',
             top: (top - 8) + 'px',
-            transform: 'translate(100%, -100%)'
+            transform
         });
 
         this.content.innerHTML = text;

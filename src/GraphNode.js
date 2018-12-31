@@ -6,6 +6,7 @@ class GraphNode {
             source: [],
             target: []
         };
+        this.nodeOptions = nodeOption;
     }
     addLink(type, linkInst){
         let typedLinks = this.links[type];
@@ -25,6 +26,9 @@ class GraphNode {
 
         return links.source.map(link => link.targetNode);
     }
+    setLayoutNode(layoutNode){
+        return this.layoutNode = layoutNode;
+    }
 };
 
 GraphNode.nodeMap = {};
@@ -35,7 +39,7 @@ export const GraphNodeCreator = {
         let { id } = nodeOption;
         let exist = !!GraphNode.nodeMap[id];
         let node = GraphNode.nodeMap[id] || new GraphNode(nodeOption);
-
+        
         if(!exist){
             GraphNode.nodeMap[id] = node;
         }
