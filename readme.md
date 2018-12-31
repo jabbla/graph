@@ -128,7 +128,7 @@ specify column gap
 ```js
 {
     columnConfig: {
-        gap: 20
+        gap: 20 //default 20
     }
 }
 ```
@@ -139,6 +139,7 @@ specify column gap
 single node config will cover renderOptions.node
 
 **node.formatter**
+
 default formatter will return node.name
 
 ```js
@@ -147,6 +148,23 @@ default formatter will return node.name
         formatter(node){
             return node.name; //default
         }
+    }
+}
+```
+
+**node.icon**
+
+specify icon which locate at the left of node-text
+
+there are several built-in icons: sql_icon，spark_icon
+
+```js
+{
+    node: {
+        icon: {
+            id: 'sql_icon', //icon id
+            color: 'red'    //color for icon
+        } 
     }
 }
 ```
