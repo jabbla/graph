@@ -4,6 +4,7 @@ const symbols = [
     {
         type: 'icon',
         id: 'sql_icon',
+        color: '#dc254c',
         create(){
             let symbol = createSvgElement('symbol');
             let title = createSvgElement('title');
@@ -57,6 +58,7 @@ const symbols = [
     {
         type: 'icon',
         id: 'spark_icon',
+        color: '#d9b70a',
         create(){
             let symbol = createSvgElement('symbol');
             let title = createSvgElement('title');
@@ -139,7 +141,7 @@ const symbols = [
 ];
 
 export const IconMap = symbols.filter(symbol => symbol.type === 'icon').reduce((prev, icon) => {
-    prev[icon.id] = true;
+    prev[icon.id] = icon;
     return prev;
 }, {}); 
 

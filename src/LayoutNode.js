@@ -41,7 +41,7 @@ class LayoutNode {
         nodeWraper.appendChild(nodeRect);
         nodeWraper.appendChild(nodeText);
         
-        if(IconMap[nodeConfig.icon.id]){
+        if(IconMap[nodeConfig.icon && nodeConfig.icon.id]){
             let nodeIcon = this.createIcon(nodeConfig.icon);
             nodeWraper.appendChild(nodeIcon);
         }
@@ -79,7 +79,7 @@ class LayoutNode {
         });
 
         setElemStyle(use, {
-            fill: icon.color
+            fill: icon.color || IconMap[icon.id].color
         });
 
         return use;

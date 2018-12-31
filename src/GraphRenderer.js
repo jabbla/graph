@@ -36,6 +36,9 @@ class GraphRenderer {
                 gap: 20
             },
             node: {
+                icon: {
+                    id: 'spark_icon'
+                },
                 formatter(node){
                     return textEllipsis(node.name, 20);
                 }
