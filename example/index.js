@@ -7,7 +7,7 @@ var renderer = Graph.init({
 var nodes = [
     {
         id: 'a',
-        name: '一二二二二二二二二二'
+        name: 'integ_browse_app_midtable_dt_start'
     },
     {
         id: 'a1',
@@ -83,6 +83,12 @@ var links1 = [
 renderer.render({
     linkConfig: {
         linkType: 'line'
+    },
+    node: {
+        icon: {
+            id: 'spark_icon',
+            color: '#d9b70a'
+        }
     },
     nodes,
     links: links1

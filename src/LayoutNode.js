@@ -5,12 +5,14 @@ import {
     setElemStyle
 } from './dom';
 import layoutLink from './LayoutLink';
+import { IconMap } from './symbols';
 
 class LayoutNode {
     constructor(graphNode, info, globalNodeConfig){
         this.graphNode = graphNode;
         this.info = info;
         this.globalNodeConfig = globalNodeConfig;
+        this.nodeConfig = {...globalNodeConfig, ...graphNode.nodeOptions};
 
         this.defaultConfig = {
             width: 200,
@@ -31,7 +33,7 @@ class LayoutNode {
         this.info.left += add;
     }
     createElement(){
-        let { graphNode } = this;
+        let { graphNode, globalNodeConfig, nodeConfig } = this;
         let nodeWraper = this.createWraper();
         let nodeRect = this.createRect();
         let nodeText = this.createText();
@@ -39,6 +41,11 @@ class LayoutNode {
         nodeWraper.appendChild(nodeRect);
         nodeWraper.appendChild(nodeText);
         
+        if(IconMap[nodeConfig.icon.id]){
+            let nodeIcon = this.createIcon(nodeConfig.icon);
+            nodeWraper.appendChild(nodeIcon);
+        }
+
         this.nodeWraper = nodeWraper;
         this.nodeRect = nodeRect;
         this.nodeText = nodeText;
@@ -56,6 +63,26 @@ class LayoutNode {
         }
 
         return nodeWraper;
+    }
+    createIcon(icon){
+        const { graphNode, globalNodeConfig } = this;
+        let { height } = this.defaultConfig;
+        let { left, top } = this.info;
+        let use = createSvgElement('use');
+
+        setSvgAttributes(use, {
+            href: `#${icon.id}`,
+            x: left + 5,
+            y: top + ((height - 20) / 2),
+            width: 20,
+            height: 20
+        });
+
+        setElemStyle(use, {
+            fill: icon.color
+        });
+
+        return use;
     }
     createWraper(){
         const { width, height, rx, ry } = this.defaultConfig
@@ -96,7 +123,7 @@ class LayoutNode {
         const nodeConfig = {...this.globalNodeConfig, ...graphNode.nodeOptions};
 
         let nodeText = createSvgElement('text');
-        let textX = x + 54,
+        let textX = x + 30,
             textY = y + 17;
 
         setSvgAttributes(nodeText, {

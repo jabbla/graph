@@ -37,7 +37,7 @@ class GraphRenderer {
             },
             node: {
                 formatter(node){
-                    return textEllipsis(node.name, 18);
+                    return textEllipsis(node.name, 20);
                 }
             }
         };

@@ -2,6 +2,7 @@ import LayoutNode from './LayoutNode';
 import LayoutLink from './LayoutLink';
 import SVGPanZoom from '../lib/SVGPanZoom';
 import ToolTip from './ToolTip';
+import Symbols from './symbols';
 import {
     createSvgElement,
     setSvgAttribute,
@@ -30,10 +31,12 @@ class Layout {
             backgroundColor
         });
 
-        let topAnchor = this.createTopAnchorSymbol();
+        let symbols = this.createSymbols();
+        symbols.forEach(symbol => {
+            this.svgCanvas.appendChild(symbol);
+        });
 
         this.linksWraper = createSvgElement('g');
-        this.svgCanvas.appendChild(topAnchor);
 
         this.rootElement = document.querySelector(el);
     }
@@ -114,36 +117,8 @@ class Layout {
             node.addLeft(rowStartColumnLeft);
         });
     }
-    createTopAnchorSymbol(){
-        let symbol = createSvgElement('symbol');
-        let title = createSvgElement('title');
-        let g = createSvgElement('g');
-        let path = createSvgElement('path');
-
-        setSvgAttributes(symbol, {
-            width: '12px',
-            height: '12px',
-            viewBox: '0 0 12 12',
-            id: 'top_anchor'
-        });
-
-        title.innerHTML = 'arrow'
-
-        setSvgAttributes(g, {
-            id: 'arrow'
-        });
-
-        setSvgAttributes(path, {
-            d: `M0,12 L0,4.5 C0,2.015 2.015,0 4.5,0 L7.5,0 C9.985,0 12,2.015 12,4.5 L12,12 L0,12 L0,12 Z M8.828,4.586 L6,7.414 L3.172,4.586 L1.757,6 L4.586,8.828 L4.586,8.828 L6,10.243 L7.414,8.828 L7.414,8.828 L10.243,6 L8.828,4.586 L8.828,4.586 Z`,
-            id: 'Shape'
-        });
-
-        g.appendChild(title);
-        g.appendChild(path);
-
-        symbol.appendChild(g);
-
-        return symbol;
+    createSymbols(){
+        return Symbols.map(value => value.create());
     }
     renderNodes(){
         const { layoutMatrix, rootElement, linksWraper } = this;
