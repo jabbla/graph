@@ -1,6 +1,6 @@
 {
   "name": "@jabbla/graph",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "javascript no circle svg graph library",
   "main": "./dist/graph.js",
   "directories": {
