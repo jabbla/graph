@@ -29,7 +29,7 @@ class GraphNode {
     setLayoutNode(layoutNode){
         return this.layoutNode = layoutNode;
     }
-};
+}
 
 GraphNode.nodeMap = {};
 export default GraphNode;

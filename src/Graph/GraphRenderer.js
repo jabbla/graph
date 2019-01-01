@@ -1,7 +1,7 @@
 import {GraphLinkCreator} from './GraphLink';
 import GraphNode from './GraphNode';
-import Layout from './Layout';
-import { textEllipsis } from './utils';
+import Layout from '../Layout/Layout';
+import { textEllipsis, mergeObject } from '../utils';
 
 class GraphRenderer {
     constructor(initOptions = {}){
@@ -17,7 +17,7 @@ class GraphRenderer {
             }
         };
         let res = {
-            svgPanZoomConfig: {...defaultOptions.svgPanZoomConfig, ...initOptions.svgPanZoomConfig}
+            svgPanZoomConfig: mergeObject(defaultOptions.svgPanZoomConfig, initOptions.svgPanZoomConfig)
         };
         
         return Object.assign(defaultOptions, initOptions, res);
@@ -46,12 +46,12 @@ class GraphRenderer {
         };
 
         return this.renderOptions = {
-            linkConfig: {...defaultOptions.linkConfig, ...renderOptions.linkConfig},
-            rowConfig: {...defaultOptions.rowConfig, ...renderOptions.rowConfig},
-            columnConfig: {...defaultOptions.columnConfig, ...renderOptions.columnConfig},
+            linkConfig: mergeObject(defaultOptions.linkConfig, renderOptions.linkConfig),
+            rowConfig: mergeObject(defaultOptions.rowConfig, renderOptions.rowConfig),
+            columnConfig: mergeObject(defaultOptions.columnConfig, renderOptions.columnConfig),
             nodes, links,
-            node: {...defaultOptions.node, ...renderOptions.node}
-        }
+            node: mergeObject(defaultOptions.node, renderOptions.node)
+        };
     }
     render(renderOptions = {}){
         const { nodes, links } = this.mergeRenderOptions(renderOptions);
@@ -85,7 +85,7 @@ class GraphRenderer {
         /**find roots */
         let nodeMap = {};
         let rootNodes = GraphLinks.filter(link => {
-            let {sourceNode, targetNode} = link;
+            let {sourceNode} = link;
             let inCount = sourceNode.getInCount();
             if(inCount === 0 && !nodeMap[sourceNode.id]){
                 nodeMap[sourceNode.id] = sourceNode;
@@ -147,27 +147,26 @@ class GraphRenderer {
         let pushToNextRow = [];
         for(let i = row.length - 1; i >= 0; i--){
             let node = row[i];
-            let sourceId = node.id;
             let targetIds = targetMap[node.id];
             let readyForRemove = [];
 
             row.every((node, index) => {
                 let has = targetIds.includes(node.id);
                 if(has){
-                    pushToNextRow.push(node)
+                    pushToNextRow.push(node);
                     readyForRemove.push(index);
                 }
                 return has;
             });
 
             readyForRemove.forEach(index => {
-                delete layoutNodeMap[row[index].id]
+                delete layoutNodeMap[row[index].id];
                 row.splice(index, 1);
             });
         }
         
         return { row, pushToNextRow };
     }
-};
+}
 
 export default GraphRenderer;

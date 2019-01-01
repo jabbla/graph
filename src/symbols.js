@@ -1,4 +1,4 @@
-import { createSvgElement, setSvgAttributes } from "./dom";
+import { createSvgElement, setSvgAttributes } from './dom';
 
 const symbols = [
     {
@@ -119,7 +119,7 @@ const symbols = [
                 id: this.id
             });
     
-            title.innerHTML = 'arrow'
+            title.innerHTML = 'arrow';
     
             setSvgAttributes(g, {
                 id: 'arrow'

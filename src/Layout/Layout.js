@@ -1,14 +1,13 @@
 import LayoutNode from './LayoutNode';
 import LayoutLink from './LayoutLink';
-import SVGPanZoom from '../lib/SVGPanZoom';
-import ToolTip from './ToolTip';
-import Symbols from './symbols';
+import SVGPanZoom from '../../lib/SVGPanZoom';
+import ToolTip from '../ToolTip';
+import Symbols from '../symbols';
 import {
     createSvgElement,
-    setSvgAttribute,
     setSvgAttributes,
     setElemStyle
-} from './dom';
+} from '../dom';
 
 class Layout {
     constructor({matrix, initOptions}){
@@ -55,7 +54,6 @@ class Layout {
 
             for(let j = 0; j < row.length; j++){
                 let graphNode = row[j];
-                let left = currentLeft;
                 let buildRes = this.buildNode(graphNode, {
                     i,
                     j,
@@ -83,13 +81,7 @@ class Layout {
         let columnIndex = j;
         let top = rowTop;
         let left = currentLeft;
-        let parentLeftSum = 0;
-        let targetLinks = graphNode.links.target;
 
-        targetLinks.forEach(link => {
-            parentLeftSum += link.sourceNode.layoutNode.getLeft();
-        });
-        //left = (parentLeftSum / targetLinks.length) || 0;
         let layoutNode = graphNode.setLayoutNode(new LayoutNode(graphNode, {
             rowIndex, columnIndex, top, left
         }, node));
@@ -102,7 +94,7 @@ class Layout {
         };
     }
     setRowContentCenter(layoutRow, sumWidth){
-        const { svgCanvas, rootElement } = this;
+        const { rootElement } = this;
         const { width } = this.initOptions;
         let pattern = /%/;
         let svgCanvasWidth = +width;

@@ -32,6 +32,7 @@ class GraphNode {
         return this.layoutNode = layoutNode;
     }
 }
+
 GraphNode.nodeMap = {};
 
 const GraphNodeCreator = {
@@ -57,7 +58,8 @@ class GraphLink {
         let {nodes} = options;
 
         this.linkOption = this.mergeLinkOptions(linkOption, options);
-        this.id = id;        
+        this.id = id;
+        
         this.sourceNode = this.buildNode('source', linkOption.source, nodes);
         this.targetNode = this.buildNode('target', linkOption.target, nodes);
     }
@@ -77,6 +79,7 @@ class GraphLink {
         return Object.assign(defaultLinkConfig, linkConfig || {}, linkOption);
     }
 }
+
 const GraphLinkCreator = {
     create(linkOption, options){
         let { source, target } = linkOption;
@@ -114,6 +117,7 @@ function setSvgAttributes(elem, option){
         setSvgAttribute(elem, attr, value);
     }
 }
+
 function setAttributes(elem, option){
     for(let attr in option){
         let value = option[attr];
@@ -121,79 +125,9 @@ function setAttributes(elem, option){
         elem.setAttribute(attr, value);
     }
 }
+
 function setElemStyle(elem, options){
     Object.assign(elem.style, options);
-}
-
-class LayoutLink {
-    constructor(graphLink){
-        this.graphLink = graphLink;
-    }
-    createElement(layoutNodeMap){
-        const { graphLink } = this;
-        const { sourceNode, targetNode } = graphLink;
-
-        const layoutSourceNode = layoutNodeMap[sourceNode.id];
-        const layoutTargetNode = layoutNodeMap[targetNode.id]; 
-
-        let g = createSvgElement('g');
-        let path = createSvgElement('path');
-        let sourcePos = this.getNodePosition(layoutSourceNode).bottomMiddle;
-        let targetPos = this.getNodePosition(layoutTargetNode).topMiddle;
-
-        this.strokeByLineType(path, {sourcePos, targetPos});
-        setSvgAttributes(path, {
-            class: 'nodeLink',
-            'data-source': graphLink.sourceNode.name,
-            'data-target': graphLink.targetNode.name
-        });
-
-        setElemStyle(path, {
-            stroke: '#B1B6C0',
-            fill: 'none',
-            strokeWidth: '2px',
-            strokeLinecap: 'round',
-            cursor: 'pointer'
-        });
-
-        g.appendChild(path);
-
-        return g;
-    }
-    getNodePosition(node){
-        let topMiddle = {
-            x: node.info.left + (node.defaultConfig.width / 2),
-            y: node.info.top - (node.defaultConfig.endPointSize)
-        };
-
-        let bottomMiddle = {
-            x: topMiddle.x,
-            y: node.info.top + node.defaultConfig.height + (node.defaultConfig.startPointSize / 2)
-        };
-
-        return {topMiddle, bottomMiddle};
-    }
-    strokeByLineType(pathElem, {targetPos, sourcePos}){
-        const { graphLink } = this;
-        const { linkOption: { linkType } } = graphLink;
-        
-        if(linkType === 'curve'){
-            setSvgAttributes(pathElem, {
-                d: `M ${targetPos.x} ${targetPos.y} 
-                Q ${targetPos.x} ${(sourcePos.y + targetPos.y)/2}, ${(sourcePos.x + targetPos.x)/2} ${(sourcePos.y + targetPos.y)/2} 
-                T ${sourcePos.x} ${sourcePos.y}`,
-                strokeLinejoin: 'round'
-            });
-        }
-        
-        if(linkType === 'line'){
-            setSvgAttributes(pathElem, {
-                d: `M ${targetPos.x} ${targetPos.y}, 
-                L ${sourcePos.x} ${sourcePos.y}`
-            });
-        }
-    }
-    
 }
 
 const symbols = [
@@ -341,12 +275,48 @@ const IconMap = symbols.filter(symbol => symbol.type === 'icon').reduce((prev, i
     return prev;
 }, {});
 
+function getTextLength(text, lengthLimit){
+    let doublePattern = /[^\x00-\xff]/;
+    let length = 0;
+    let index = text.length - 1;
+
+    for(let i = 0; i < text.length; i++){
+        if(doublePattern.test(text[i])){
+            length += 2;
+        }else{
+            length += 1;
+        }
+
+        if(length >= lengthLimit){
+            index = i;
+            lengthLimit = text.length*3;
+        }
+    }
+
+    return {
+        length,
+        index
+    };
+}
+
+function textEllipsis(text, length){
+    let { length: textLength, index } = getTextLength(text, length);
+    if(textLength > length){
+        return text.slice(0, (index - 2)) + '...';
+    }
+    return text;
+}
+
+function mergeObject(source1, source2){
+    return Object.assign({}, source1, source2);
+}
+
 class LayoutNode {
     constructor(graphNode, info, globalNodeConfig){
         this.graphNode = graphNode;
         this.info = info;
         this.globalNodeConfig = globalNodeConfig;
-        this.nodeConfig = {...globalNodeConfig, ...graphNode.nodeOptions};
+        this.nodeConfig = mergeObject(globalNodeConfig, graphNode.nodeOptions);
 
         this.defaultConfig = {
             width: 200,
@@ -367,7 +337,7 @@ class LayoutNode {
         this.info.left += add;
     }
     createElement(){
-        let { graphNode, globalNodeConfig, nodeConfig } = this;
+        let { graphNode, nodeConfig } = this;
         let nodeWraper = this.createWraper();
         let nodeRect = this.createRect();
         let nodeText = this.createText();
@@ -453,7 +423,7 @@ class LayoutNode {
     createText(){
         const { graphNode } = this;
         const { top: y, left: x } = this.info;
-        const nodeConfig = {...this.globalNodeConfig, ...graphNode.nodeOptions};
+        const nodeConfig = mergeObject(this.globalNodeConfig, graphNode.nodeOptions);
 
         let nodeText = createSvgElement('text');
         let textX = x + 30,
@@ -510,7 +480,7 @@ class LayoutNode {
         return g;
     }
     creatEndPoint(){
-        let { width, startPointSize, height, endPointSize } = this.defaultConfig;
+        let { width, endPointSize } = this.defaultConfig;
         let { left, top } = this.info;
         let g = createSvgElement('g');
         let use = createSvgElement('use');
@@ -536,6 +506,77 @@ class LayoutNode {
 
         return g;
     }
+}
+
+class LayoutLink {
+    constructor(graphLink){
+        this.graphLink = graphLink;
+    }
+    createElement(layoutNodeMap){
+        const { graphLink } = this;
+        const { sourceNode, targetNode } = graphLink;
+
+        const layoutSourceNode = layoutNodeMap[sourceNode.id];
+        const layoutTargetNode = layoutNodeMap[targetNode.id]; 
+
+        let g = createSvgElement('g');
+        let path = createSvgElement('path');
+        let sourcePos = this.getNodePosition(layoutSourceNode).bottomMiddle;
+        let targetPos = this.getNodePosition(layoutTargetNode).topMiddle;
+
+        this.strokeByLineType(path, {sourcePos, targetPos});
+        setSvgAttributes(path, {
+            class: 'nodeLink',
+            'data-source': graphLink.sourceNode.name,
+            'data-target': graphLink.targetNode.name
+        });
+
+        setElemStyle(path, {
+            stroke: '#B1B6C0',
+            fill: 'none',
+            strokeWidth: '2px',
+            strokeLinecap: 'round',
+            cursor: 'pointer'
+        });
+
+        g.appendChild(path);
+
+        return g;
+    }
+    getNodePosition(node){
+        let topMiddle = {
+            x: node.info.left + (node.defaultConfig.width / 2),
+            y: node.info.top - (node.defaultConfig.endPointSize)
+        };
+
+        let bottomMiddle = {
+            x: topMiddle.x,
+            y: node.info.top + node.defaultConfig.height + (node.defaultConfig.startPointSize / 2)
+        };
+
+        return {topMiddle, bottomMiddle};
+    }
+    strokeByLineType(pathElem, {targetPos, sourcePos}){
+        const { graphLink } = this;
+        const { linkOption: { linkType } } = graphLink;
+        
+        if(linkType === 'curve'){
+            setSvgAttributes(pathElem, {
+                d: `M ${targetPos.x} ${targetPos.y} 
+                Q ${targetPos.x} ${(sourcePos.y + targetPos.y)/2}, ${(sourcePos.x + targetPos.x)/2} ${(sourcePos.y + targetPos.y)/2} 
+                T ${sourcePos.x} ${sourcePos.y}`,
+                strokeLinejoin: 'round'
+            });
+        }
+        
+        if(linkType === 'line'){
+            setSvgAttributes(pathElem, {
+                d: `M ${targetPos.x} ${targetPos.y}, 
+                L ${sourcePos.x} ${sourcePos.y}`
+            });
+        }
+    }
+    
 }
 
 // svg-pan-zoom v3.6.0
@@ -673,13 +714,7 @@ class Layout {
         let columnIndex = j;
         let top = rowTop;
         let left = currentLeft;
-        let parentLeftSum = 0;
-        let targetLinks = graphNode.links.target;
 
-        targetLinks.forEach(link => {
-            parentLeftSum += link.sourceNode.layoutNode.getLeft();
-        });
-        //left = (parentLeftSum / targetLinks.length) || 0;
         let layoutNode = graphNode.setLayoutNode(new LayoutNode(graphNode, {
             rowIndex, columnIndex, top, left
         }, node));
@@ -692,7 +727,7 @@ class Layout {
         };
     }
     setRowContentCenter(layoutRow, sumWidth){
-        const { svgCanvas, rootElement } = this;
+        const { rootElement } = this;
         const { width } = this.initOptions;
         let pattern = /%/;
         let svgCanvasWidth = +width;
@@ -784,37 +819,6 @@ class Layout {
 
 Layout.layoutNodeMap = {};
 
-function getTextLength(text, lengthLimit){
-    let doublePattern = /[^\x00-\xff]/;
-    let length = 0;
-    let index = text.length - 1;
-
-    for(let i = 0; i < text.length; i++){
-        if(doublePattern.test(text[i])){
-            length += 2;
-        }else{
-            length += 1;
-        }
-
-        if(length >= lengthLimit){
-            index = i;
-            lengthLimit = text.length*3;
-        }
-    }
-
-    return {
-        length,
-        index
-    };
-}
-function textEllipsis(text, length){
-    let { length: textLength, index } = getTextLength(text, length);
-    if(textLength > length){
-        return text.slice(0, (index - 2)) + '...';
-    }
-    return text;
-}
-
 class GraphRenderer {
     constructor(initOptions = {}){
         this.initOptions = this.mergeInitOptions(initOptions);
@@ -829,7 +833,7 @@ class GraphRenderer {
             }
         };
         let res = {
-            svgPanZoomConfig: {...defaultOptions.svgPanZoomConfig, ...initOptions.svgPanZoomConfig}
+            svgPanZoomConfig: mergeObject(defaultOptions.svgPanZoomConfig, initOptions.svgPanZoomConfig)
         };
         
         return Object.assign(defaultOptions, initOptions, res);
@@ -858,12 +862,12 @@ class GraphRenderer {
         };
 
         return this.renderOptions = {
-            linkConfig: {...defaultOptions.linkConfig, ...renderOptions.linkConfig},
-            rowConfig: {...defaultOptions.rowConfig, ...renderOptions.rowConfig},
-            columnConfig: {...defaultOptions.columnConfig, ...renderOptions.columnConfig},
+            linkConfig: mergeObject(defaultOptions.linkConfig, renderOptions.linkConfig),
+            rowConfig: mergeObject(defaultOptions.rowConfig, renderOptions.rowConfig),
+            columnConfig: mergeObject(defaultOptions.columnConfig, renderOptions.columnConfig),
             nodes, links,
-            node: {...defaultOptions.node, ...renderOptions.node}
-        }
+            node: mergeObject(defaultOptions.node, renderOptions.node)
+        };
     }
     render(renderOptions = {}){
         const { nodes, links } = this.mergeRenderOptions(renderOptions);
@@ -897,7 +901,7 @@ class GraphRenderer {
         /**find roots */
         let nodeMap = {};
         let rootNodes = GraphLinks.filter(link => {
-            let {sourceNode, targetNode} = link;
+            let {sourceNode} = link;
             let inCount = sourceNode.getInCount();
             if(inCount === 0 && !nodeMap[sourceNode.id]){
                 nodeMap[sourceNode.id] = sourceNode;
@@ -959,7 +963,6 @@ class GraphRenderer {
         let pushToNextRow = [];
         for(let i = row.length - 1; i >= 0; i--){
             let node = row[i];
-            let sourceId = node.id;
             let targetIds = targetMap[node.id];
             let readyForRemove = [];
 

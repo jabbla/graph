@@ -1,18 +1,17 @@
 import {
     createSvgElement,
-    setSvgAttribute,
     setSvgAttributes,
     setElemStyle
-} from './dom';
-import layoutLink from './LayoutLink';
-import { IconMap } from './symbols';
+} from '../dom';
+import { IconMap } from '../symbols';
+import { mergeObject } from '../utils';
 
 class LayoutNode {
     constructor(graphNode, info, globalNodeConfig){
         this.graphNode = graphNode;
         this.info = info;
         this.globalNodeConfig = globalNodeConfig;
-        this.nodeConfig = {...globalNodeConfig, ...graphNode.nodeOptions};
+        this.nodeConfig = mergeObject(globalNodeConfig, graphNode.nodeOptions);
 
         this.defaultConfig = {
             width: 200,
@@ -33,7 +32,7 @@ class LayoutNode {
         this.info.left += add;
     }
     createElement(){
-        let { graphNode, globalNodeConfig, nodeConfig } = this;
+        let { graphNode, nodeConfig } = this;
         let nodeWraper = this.createWraper();
         let nodeRect = this.createRect();
         let nodeText = this.createText();
@@ -65,7 +64,6 @@ class LayoutNode {
         return nodeWraper;
     }
     createIcon(icon){
-        const { graphNode, globalNodeConfig } = this;
         let { height } = this.defaultConfig;
         let { left, top } = this.info;
         let use = createSvgElement('use');
@@ -85,7 +83,7 @@ class LayoutNode {
         return use;
     }
     createWraper(){
-        const { width, height, rx, ry } = this.defaultConfig
+        const { width, height, rx, ry } = this.defaultConfig;
         const { id, name } = this.graphNode;
 
         let nodeWraper = createSvgElement('g');
@@ -99,7 +97,7 @@ class LayoutNode {
         return nodeWraper;
     }
     createRect(){
-        const { width, height, rx, ry } = this.defaultConfig
+        const { width, height, rx, ry } = this.defaultConfig;
         const { top: y, left: x } = this.info;
 
         let nodeRect = createSvgElement('rect');
@@ -120,7 +118,7 @@ class LayoutNode {
     createText(){
         const { graphNode } = this;
         const { top: y, left: x } = this.info;
-        const nodeConfig = {...this.globalNodeConfig, ...graphNode.nodeOptions};
+        const nodeConfig = mergeObject(this.globalNodeConfig, graphNode.nodeOptions);
 
         let nodeText = createSvgElement('text');
         let textX = x + 30,
@@ -177,7 +175,7 @@ class LayoutNode {
         return g;
     }
     creatEndPoint(){
-        let { width, startPointSize, height, endPointSize } = this.defaultConfig;
+        let { width, endPointSize } = this.defaultConfig;
         let { left, top } = this.info;
         let g = createSvgElement('g');
         let use = createSvgElement('use');

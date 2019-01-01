@@ -1,4 +1,4 @@
-import { createSvgElement, setSvgAttributes, setElemStyle } from "./dom";
+import { createSvgElement, setSvgAttributes, setElemStyle } from "../dom";
 
 class LayoutLink {
     constructor(graphLink){
@@ -7,7 +7,6 @@ class LayoutLink {
     createElement(layoutNodeMap){
         const { graphLink } = this;
         const { sourceNode, targetNode } = graphLink;
-        const { linkOption } = graphLink;
 
         const layoutSourceNode = layoutNodeMap[sourceNode.id];
         const layoutTargetNode = layoutNodeMap[targetNode.id]; 
@@ -70,6 +69,6 @@ class LayoutLink {
         }
     }
     
-};
+}
 
 export default LayoutLink;
