@@ -3,6 +3,7 @@ export default {
     input: 'src/index.js',
     output: {
         file: outputFile,
-        format: 'cjs'
+        format: 'umd',
+        name: 'bundle'
     }
 };
