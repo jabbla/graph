@@ -19,15 +19,18 @@ const inputOptions = [
 const outputOptions = [
     {
         file: 'docs/dist/graph.js',
-        format: 'cjs'
+        format: 'umd',
+        name: 'bundle'
     },
     {
         file: 'dist/graph.js',
-        format: 'cjs'
+        format: 'umd',
+        name: 'bundle'
     },
     {
         file: 'dist/graph.min.js',
-        format: 'cjs'
+        format: 'umd',
+        name: 'bundle'
     }
 ]
 
