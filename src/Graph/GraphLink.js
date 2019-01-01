@@ -9,13 +9,12 @@ class GraphLink {
         let {nodes} = options;
 
         this.linkOption = this.mergeLinkOptions(linkOption, options);
-        this.id = id;;
+        this.id = id;
         
         this.sourceNode = this.buildNode('source', linkOption.source, nodes);
         this.targetNode = this.buildNode('target', linkOption.target, nodes);
     }
     buildNode(type, nodeId, nodes){
-        const { id } = this;
         let nodeRes = GraphNodeCreator.create(nodes.find(node => node.id === nodeId));
     
         nodeRes.node.addLink(type, this);
@@ -30,7 +29,7 @@ class GraphLink {
 
         return Object.assign(defaultLinkConfig, linkConfig || {}, linkOption);
     }
-};
+}
 
 export const GraphLinkCreator = {
     create(linkOption, options){

@@ -4,7 +4,7 @@ export function createSvgElement(tagname){
         setAttributes(elem, {
             xmlns: 'http://www.w3.org/2000/svg',
             version: '1.1'
-        })
+        });
     }
     return elem;
 }
@@ -19,7 +19,7 @@ export function setSvgAttributes(elem, option){
 
         setSvgAttribute(elem, attr, value);
     }
-};
+}
 
 export function setAttributes(elem, option){
     for(let attr in option){
@@ -27,8 +27,8 @@ export function setAttributes(elem, option){
 
         elem.setAttribute(attr, value);
     }
-};
+}
 
 export function setElemStyle(elem, options){
     Object.assign(elem.style, options);
-};
+}

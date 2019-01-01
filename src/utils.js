@@ -20,7 +20,7 @@ export function getTextLength(text, lengthLimit){
         length,
         index
     };
-};
+}
 
 export function textEllipsis(text, length){
     let { length: textLength, index } = getTextLength(text, length);
@@ -28,4 +28,8 @@ export function textEllipsis(text, length){
         return text.slice(0, (index - 2)) + '...';
     }
     return text;
-};
+}
+
+export function mergeObject(source1, source2){
+    return Object.assign({}, source1, source2);
+}

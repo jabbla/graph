@@ -57,6 +57,6 @@ class ToolTip {
     hide(){
         document.body.removeChild(this.elem);
     }
-};
+}
 
 export default ToolTip;
