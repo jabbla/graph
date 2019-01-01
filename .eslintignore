@@ -3,3 +3,5 @@ dist
 example
 lib
 rollup.config.js
+./index.js
+scripts
