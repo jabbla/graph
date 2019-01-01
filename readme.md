@@ -1,5 +1,7 @@
 ## Graph
 
+[demo](https://codepen.io/jabbla/pen/XozLaM)
+
 ## Basic Usage
 
 ### install
@@ -14,7 +16,7 @@ import Graph from '@jabbla/graph'
 
 or via CDN
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@jabbla/graph@1.0.3/dist/graph.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@jabbla/graph@1.1.0/dist/graph.min.js"></script>
 ```
 
 ```js
