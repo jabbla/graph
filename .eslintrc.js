@@ -1,3 +1,6 @@
+const env = process.env.NODE_ENV;
+const noDebugger = env === 'dev'? 'off':'error';
+console.log(env);
 module.exports = {
     "env": {
         "browser": true,
@@ -9,6 +12,7 @@ module.exports = {
         "sourceType": "module"
     },
     "rules": {
+        "no-debugger": noDebugger,
         "no-control-regex": "off",
         "indent": [
             "error",

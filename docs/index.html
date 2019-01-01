@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>栗子</title>
+    <style>
+        body {
+            margin: 0;
+        }
+        body, html, #container {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        #container {
+            padding: 50px;
+            padding-top: 100px;
+        }
+        #viewport {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        .m-btn-areas {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 50px;
+        }
+        .m-btn-area {
+            margin-bottom: 10px;
+        }
+        .button {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="m-btn-areas">
+        <div class="m-btn-area">
+            <button class="button" id="button_curve">曲线</button>
+            <button class="button" id="button_line">直线</button>
+            <button class="button" id="button_sql_icon">图标: sql_icon</button>
+            <button class="button" id="button_spark_icon">图标: spark_icon</button>
+        </div>
+        <div class="m-btn-area">
+            icon颜色：<input type="text" id="icon_color"/><button id="button_icon_color">设置颜色</button>
+            行间隔：<input type="number" id="row_gap"/><button id="button_row_gap">设置间隔</button>
+            列间隔：<input type="number" id="column_gap"/><button id="button_column_gap">设置间隔</button>
+        </div>
+    </div>
+    <div id="container">
+
+    </div>
+    <script src="./dist/graph.js"></script>
+    <script src="./index.js"></script>
+</body>
+</html>

@@ -11,8 +11,8 @@ class LayoutNode {
         this.graphNode = graphNode;
         this.info = info;
         this.globalNodeConfig = globalNodeConfig;
-        this.nodeConfig = mergeObject(globalNodeConfig, graphNode.nodeOptions);
-
+        this.nodeConfig = mergeObject(globalNodeConfig, graphNode.nodeOptions, true);
+        
         this.defaultConfig = {
             width: 200,
             height: 32,
@@ -118,8 +118,8 @@ class LayoutNode {
     createText(){
         const { graphNode } = this;
         const { top: y, left: x } = this.info;
-        const nodeConfig = mergeObject(this.globalNodeConfig, graphNode.nodeOptions);
-
+        const nodeConfig = mergeObject(this.globalNodeConfig, graphNode.nodeOptions, true);
+        
         let nodeText = createSvgElement('text');
         let textX = x + 30,
             textY = y + 17;

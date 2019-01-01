@@ -307,8 +307,36 @@ function textEllipsis(text, length){
     return text;
 }
 
-function mergeObject(source1, source2){
-    return Object.assign({}, source1, source2);
+function mergeObject(source1, source2, deep){
+    let value = function(value1, value2){
+        let val2Undefined = typeof value2 === 'undefined';
+        let res = val2Undefined? value1 : value2;
+        return res;
+    };
+    let deepAssign = (function(){
+        var assignSingle = function(target, source){
+            for(var key in source){
+                if(typeof target[key] !== 'object' || typeof source[key] !== 'object'){
+                    target[key] = value(target[key], source[key]);
+                }else{
+                    assignSingle(target[key], source[key]);
+                }
+            }
+            return target;
+        };
+    
+        return function(){
+            var args = [].slice.call(arguments, 0);
+            var result = args[0];
+    
+            args.slice(1).forEach(function(item){
+                assignSingle(result, item);
+            });
+            return result;
+        };
+    })();
+
+    return deep? deepAssign({}, source1, source2) : Object.assign({}, source1, source2);
 }
 
 class LayoutNode {
@@ -316,8 +344,8 @@ class LayoutNode {
         this.graphNode = graphNode;
         this.info = info;
         this.globalNodeConfig = globalNodeConfig;
-        this.nodeConfig = mergeObject(globalNodeConfig, graphNode.nodeOptions);
-
+        this.nodeConfig = mergeObject(globalNodeConfig, graphNode.nodeOptions, true);
+        
         this.defaultConfig = {
             width: 200,
             height: 32,
@@ -423,8 +451,8 @@ class LayoutNode {
     createText(){
         const { graphNode } = this;
         const { top: y, left: x } = this.info;
-        const nodeConfig = mergeObject(this.globalNodeConfig, graphNode.nodeOptions);
-
+        const nodeConfig = mergeObject(this.globalNodeConfig, graphNode.nodeOptions, true);
+        
         let nodeText = createSvgElement('text');
         let textX = x + 30,
             textY = y + 17;
@@ -833,7 +861,7 @@ class GraphRenderer {
             }
         };
         let res = {
-            svgPanZoomConfig: mergeObject(defaultOptions.svgPanZoomConfig, initOptions.svgPanZoomConfig)
+            svgPanZoomConfig: mergeObject(defaultOptions.svgPanZoomConfig, initOptions.svgPanZoomConfig, true)
         };
         
         return Object.assign(defaultOptions, initOptions, res);
@@ -862,11 +890,11 @@ class GraphRenderer {
         };
 
         return this.renderOptions = {
-            linkConfig: mergeObject(defaultOptions.linkConfig, renderOptions.linkConfig),
-            rowConfig: mergeObject(defaultOptions.rowConfig, renderOptions.rowConfig),
-            columnConfig: mergeObject(defaultOptions.columnConfig, renderOptions.columnConfig),
+            linkConfig: mergeObject(defaultOptions.linkConfig, renderOptions.linkConfig, true),
+            rowConfig: mergeObject(defaultOptions.rowConfig, renderOptions.rowConfig, true),
+            columnConfig: mergeObject(defaultOptions.columnConfig, renderOptions.columnConfig, true),
             nodes, links,
-            node: mergeObject(defaultOptions.node, renderOptions.node)
+            node: mergeObject(defaultOptions.node, renderOptions.node, true)
         };
     }
     render(renderOptions = {}){

@@ -17,7 +17,7 @@ class GraphRenderer {
             }
         };
         let res = {
-            svgPanZoomConfig: mergeObject(defaultOptions.svgPanZoomConfig, initOptions.svgPanZoomConfig)
+            svgPanZoomConfig: mergeObject(defaultOptions.svgPanZoomConfig, initOptions.svgPanZoomConfig, true)
         };
         
         return Object.assign(defaultOptions, initOptions, res);
@@ -46,11 +46,11 @@ class GraphRenderer {
         };
 
         return this.renderOptions = {
-            linkConfig: mergeObject(defaultOptions.linkConfig, renderOptions.linkConfig),
-            rowConfig: mergeObject(defaultOptions.rowConfig, renderOptions.rowConfig),
-            columnConfig: mergeObject(defaultOptions.columnConfig, renderOptions.columnConfig),
+            linkConfig: mergeObject(defaultOptions.linkConfig, renderOptions.linkConfig, true),
+            rowConfig: mergeObject(defaultOptions.rowConfig, renderOptions.rowConfig, true),
+            columnConfig: mergeObject(defaultOptions.columnConfig, renderOptions.columnConfig, true),
             nodes, links,
-            node: mergeObject(defaultOptions.node, renderOptions.node)
+            node: mergeObject(defaultOptions.node, renderOptions.node, true)
         };
     }
     render(renderOptions = {}){

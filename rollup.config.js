@@ -1,7 +1,7 @@
 import minify from 'rollup-plugin-babel-minify';
 
 const env = process.env.NODE_ENV;
-const outputFile = env === 'dev'? 'example/dist/bundle.js':'dist/bundle.min.js';
+const outputFile = env === 'dev'? 'docs/dist/graph.js':'dist/graph.min.js';
 const devPlugins = [];
 const prodPlugins = [minify({
     comments: false,
