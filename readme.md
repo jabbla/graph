@@ -49,6 +49,15 @@ var options = {
 }
 ```
 
+### options.toolBox
+> show toolBox
+
+```js
+var options = {
+    toolBox: true //default true
+}
+```
+
 ### options.svgPanZoomConfig
 > use library svg-pan-zoom.js, you can customize behaviors on you own
 

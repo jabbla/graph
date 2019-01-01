@@ -12,9 +12,8 @@ class GraphRenderer {
             width: '100%',
             height: '100%',
             backgroundColor: 'transparent',
-            svgPanZoomConfig: {
-                controlIconsEnabled: true
-            }
+            svgPanZoomConfig: {},
+            toolBox: true
         };
         let res = {
             svgPanZoomConfig: mergeObject(defaultOptions.svgPanZoomConfig, initOptions.svgPanZoomConfig, true)

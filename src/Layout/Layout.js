@@ -3,6 +3,7 @@ import LayoutLink from './LayoutLink';
 import SVGPanZoom from '../../lib/SVGPanZoom';
 import ToolTip from '../ToolTip';
 import Symbols from '../symbols';
+import ToolBox from '../ToolBox';
 import {
     createSvgElement,
     setSvgAttributes,
@@ -139,7 +140,7 @@ class Layout {
     render(){
         this.renderNodes();
         this.addEventListeners();
-        this.setSVGPanZoom();
+        this.setToolBox(this.setSVGPanZoom());
     }
     addEventListeners(){
         let svgDom = document.querySelector('#viewport');
@@ -180,7 +181,21 @@ class Layout {
     }
     setSVGPanZoom(){
         const { svgPanZoomConfig } = this.initOptions;
-        SVGPanZoom('#viewport', svgPanZoomConfig);
+
+        return SVGPanZoom('#viewport', svgPanZoomConfig);
+    }
+    setToolBox(panZoomTiger){
+        const { toolBox } = this.initOptions;
+        if(!toolBox){
+            return;
+        }
+
+        const Toolbox = new ToolBox(panZoomTiger);
+
+        requestAnimationFrame(() => {
+            const toolboxElem = Toolbox.create('#viewport');
+            document.body.appendChild(toolboxElem);
+        });
     }
 }
 
