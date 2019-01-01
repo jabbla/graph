@@ -1,8 +1,8 @@
 {
-  "name": "graph",
+  "name": "@jabbla/graph",
   "version": "1.0.0",
   "description": "javascript no circle svg graph library",
-  "main": "index.js",
+  "main": "./dist/graph.js",
   "directories": {
     "example": "example",
     "lib": "lib"
@@ -18,10 +18,8 @@
     "rollup-plugin-babel-minify": "^6.2.0"
   },
   "scripts": {
-    "package:dev": "cross-env NODE_ENV=dev ./node_modules/rollup/bin/rollup -c -w",
-    "package:prod": "cross-env NODE_ENV=prod ./node_modules/rollup/bin/rollup -c",
-    "dev": "npm run lint:dev && npm run package:dev",
-    "build": "npm run lint:prod && npm run package:prod",
+    "dev": "npm run lint:dev && ./node_modules/rollup/bin/rollup -c -w",
+    "build": "npm run lint:prod && node scripts/build.js",
     "lint:dev": "cross-env NODE_ENV=dev ./node_modules/.bin/eslint ./src/**/*.js",
     "lint:prod": "cross-env NODE_ENV=prod ./node_modules/.bin/eslint ./src/**/*.js",
     "test": "npm run test",

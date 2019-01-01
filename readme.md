@@ -2,6 +2,25 @@
 
 ## Basic Usage
 
+### install
+You can install the library via npm
+```bash
+npm install @jabbla/graph
+```
+
+```js
+import Graph from '@jabbla/graph'
+```
+
+or via CDN
+```html
+<script src="https://cdn.jsdelivr.net/npm/@jabbla/graph@1.0.0/dist/graph.min.js"></script>
+```
+
+```js
+var Graph = window.Graph
+```
+
 ## init
 ```js
 var renderer = Graph.init(options)

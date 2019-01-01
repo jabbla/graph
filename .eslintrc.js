@@ -1,6 +1,6 @@
 const env = process.env.NODE_ENV;
 const noDebugger = env === 'dev'? 'off':'error';
-console.log(env);
+
 module.exports = {
     "env": {
         "browser": true,
