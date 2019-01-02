@@ -58,6 +58,12 @@ var options = {
 var options = {
     toolBox: true //default true
 }
+
+var options = {
+    toolBox: {
+        zIndex: '100'   //specify toolBox z-index
+    }
+}
 ```
 
 ### options.svgPanZoomConfig

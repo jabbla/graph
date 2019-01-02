@@ -16,8 +16,9 @@ const Icons = {
 };
 
 class ToolBox {
-    constructor(panZoomTiger){
+    constructor(panZoomTiger, toolBoxConfig){
         this.panZoomTiger = panZoomTiger;
+        this.toolBoxConfig = toolBoxConfig;
     }
     create(svgStr){
         const svg = document.querySelector(svgStr);
@@ -25,6 +26,12 @@ class ToolBox {
         const zoomInBtn = document.createElement('li');
         const zoomOutBtn = document.createElement('li');
         const resetBtn = document.createElement('li');
+
+        let { toolBoxConfig } = this;
+        let zIndex = '1500';
+        if(typeof toolBoxConfig === 'object'){
+            zIndex = toolBoxConfig.zIndex || zIndex;
+        }
 
         let clientRect = svg.getBoundingClientRect();
         Object.assign(toolBox.style, {
@@ -34,7 +41,8 @@ class ToolBox {
             fontSize: '12px',
             margin: '0',
             transform: 'translateY(-100%)',
-            padding: '10px'
+            padding: '10px',
+            zIndex
         });
 
         this.build(zoomInBtn, 'zoomIn');
