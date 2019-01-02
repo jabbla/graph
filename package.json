@@ -18,7 +18,7 @@
     "rollup-plugin-babel-minify": "^6.2.0"
   },
   "scripts": {
-    "dev": "npm run lint:dev && ./node_modules/rollup/bin/rollup -c -w",
+    "dev": "npm run lint:dev && rollup -c -w",
     "build": "npm run lint:prod && node scripts/build.js",
     "lint:dev": "cross-env NODE_ENV=dev ./node_modules/.bin/eslint ./src/**/*.js",
     "lint:prod": "cross-env NODE_ENV=prod ./node_modules/.bin/eslint ./src/**/*.js",

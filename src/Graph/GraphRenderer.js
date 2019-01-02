@@ -66,6 +66,9 @@ class GraphRenderer {
         GraphNode.nodeMap = {};
         Layout.layoutNodeMap = {};
     }
+    destroy(){
+        this.Layout.destroy();
+    }
     build(renderOptions){
         const { 
             nodes, links, linkConfig, rowConfig, columnConfig,
@@ -113,6 +116,8 @@ class GraphRenderer {
 
         /**create layout with matrix */
         let layout = new Layout({matrix, initOptions: this.initOptions});
+
+        this.Layout = layout;
 
         return layout;
     }

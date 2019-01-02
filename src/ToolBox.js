@@ -16,9 +16,13 @@ const Icons = {
 };
 
 class ToolBox {
-    constructor(panZoomTiger, toolBoxConfig){
-        this.panZoomTiger = panZoomTiger;
-        this.toolBoxConfig = toolBoxConfig;
+    constructor(options){
+        this.panZoomTiger = options.panZoomTiger;
+        this.toolBoxConfig = options.toolBox;
+        this.container = options.container;
+    }
+    destroy(){
+        this.container.removeChild(this.toolBox);
     }
     create(svgStr){
         const svg = document.querySelector(svgStr);
@@ -33,11 +37,11 @@ class ToolBox {
             zIndex = toolBoxConfig.zIndex || zIndex;
         }
 
-        let clientRect = svg.getBoundingClientRect();
+        let svgClientRect = svg.getBoundingClientRect();
         Object.assign(toolBox.style, {
             position: 'fixed',
-            left: clientRect.left + 'px',
-            top: clientRect.bottom + 'px',
+            left: svgClientRect.left + 'px',
+            top: svgClientRect.bottom + 'px',
             fontSize: '12px',
             margin: '0',
             transform: 'translateY(-100%)',
@@ -58,7 +62,7 @@ class ToolBox {
         this.zoomOutBtn = zoomOutBtn;
         this.resetBtn = resetBtn;
 
-        return toolBox;
+        this.container.appendChild(toolBox);
     }
     build(li, type){
         let icon = document.createElement('span');

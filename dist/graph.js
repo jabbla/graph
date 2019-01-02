@@ -690,9 +690,13 @@
     };
 
     class ToolBox {
-        constructor(panZoomTiger, toolBoxConfig){
-            this.panZoomTiger = panZoomTiger;
-            this.toolBoxConfig = toolBoxConfig;
+        constructor(options){
+            this.panZoomTiger = options.panZoomTiger;
+            this.toolBoxConfig = options.toolBox;
+            this.container = options.container;
+        }
+        destroy(){
+            this.container.removeChild(this.toolBox);
         }
         create(svgStr){
             const svg = document.querySelector(svgStr);
@@ -707,11 +711,11 @@
                 zIndex = toolBoxConfig.zIndex || zIndex;
             }
 
-            let clientRect = svg.getBoundingClientRect();
+            let svgClientRect = svg.getBoundingClientRect();
             Object.assign(toolBox.style, {
                 position: 'fixed',
-                left: clientRect.left + 'px',
-                top: clientRect.bottom + 'px',
+                left: svgClientRect.left + 'px',
+                top: svgClientRect.bottom + 'px',
                 fontSize: '12px',
                 margin: '0',
                 transform: 'translateY(-100%)',
@@ -732,7 +736,7 @@
             this.zoomOutBtn = zoomOutBtn;
             this.resetBtn = resetBtn;
 
-            return toolBox;
+            this.container.appendChild(toolBox);
         }
         build(li, type){
             let icon = document.createElement('span');
@@ -980,12 +984,21 @@
                 return;
             }
 
-            const Toolbox = new ToolBox(panZoomTiger, toolBox);
+            const Toolbox = new ToolBox({
+                panZoomTiger, 
+                toolBox, 
+                container: this.rootElement});
 
+            this.Toolbox = Toolbox;
             requestAnimationFrame(() => {
-                const toolboxElem = Toolbox.create('#viewport');
-                document.body.appendChild(toolboxElem);
+                Toolbox.create('#viewport');
             });
+            
+            return ToolBox;
+        }
+        destroy(){
+            this.rootElement.removeChild(document.querySelector('#viewport'));
+            this.Toolbox.destroy();
         }
     }
 
@@ -1054,6 +1067,9 @@
             GraphNode.nodeMap = {};
             Layout.layoutNodeMap = {};
         }
+        destroy(){
+            this.Layout.destroy();
+        }
         build(renderOptions){
             const { 
                 nodes, links, linkConfig, rowConfig, columnConfig,
@@ -1101,6 +1117,8 @@
 
             /**create layout with matrix */
             let layout = new Layout({matrix, initOptions: this.initOptions});
+
+            this.Layout = layout;
 
             return layout;
         }
