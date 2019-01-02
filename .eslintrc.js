@@ -19,7 +19,7 @@ module.exports = {
             4
         ],
         "linebreak-style": [
-            "error",
+            "warn",
             "unix"
         ],
         "semi": [

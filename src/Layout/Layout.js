@@ -190,12 +190,21 @@ class Layout {
             return;
         }
 
-        const Toolbox = new ToolBox(panZoomTiger, toolBox);
+        const Toolbox = new ToolBox({
+            panZoomTiger, 
+            toolBox, 
+            container: this.rootElement});
 
+        this.Toolbox = Toolbox;
         requestAnimationFrame(() => {
-            const toolboxElem = Toolbox.create('#viewport');
-            document.body.appendChild(toolboxElem);
+            Toolbox.create('#viewport');
         });
+        
+        return ToolBox;
+    }
+    destroy(){
+        this.rootElement.removeChild(document.querySelector('#viewport'));
+        this.Toolbox.destroy();
     }
 }
 
