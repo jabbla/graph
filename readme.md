@@ -204,3 +204,10 @@ there are several built-in icons: sql_icon，spark_icon
     }
 }
 ```
+
+## destroy
+> removeChild from container
+
+```js
+renderer.destroy();
+```
