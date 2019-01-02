@@ -53,8 +53,6 @@
         }
     };
 
-    const linkMap = {};
-
     class GraphLink {
         constructor(linkOption, options){
             let { source, target } = linkOption;
@@ -83,16 +81,17 @@
             return Object.assign(defaultLinkConfig, linkConfig || {}, linkOption);
         }
     }
+    GraphLink.linkMap = {};
 
     const GraphLinkCreator = {
         create(linkOption, options){
             let { source, target } = linkOption;
             let id = `${source}#!#@#${target}`;
-            let exist = !!linkMap[id];
-            let link = linkMap[id] || new GraphLink(linkOption, options);
+            let exist = !!GraphLink.linkMap[id];
+            let link = GraphLink.linkMap[id] || new GraphLink(linkOption, options);
 
             if(exist){
-                linkMap[id] = link;
+                GraphLink.linkMap[id] = link;
             }
 
             return {exist, link};
@@ -548,13 +547,13 @@
             const { graphLink } = this;
             const { sourceNode, targetNode } = graphLink;
 
-            const layoutSourceNode = layoutNodeMap[sourceNode.id];
-            const layoutTargetNode = layoutNodeMap[targetNode.id]; 
+            this.layoutSourceNode = layoutNodeMap[sourceNode.id];
+            this.layoutTargetNode = layoutNodeMap[targetNode.id]; 
 
             let g = createSvgElement('g');
             let path = createSvgElement('path');
-            let sourcePos = this.getNodePosition(layoutSourceNode).bottomMiddle;
-            let targetPos = this.getNodePosition(layoutTargetNode).topMiddle;
+            let sourcePos = this.getNodePosition(this.layoutSourceNode).bottomMiddle;
+            let targetPos = this.getNodePosition(this.layoutTargetNode).topMiddle;
 
             this.strokeByLineType(path, {sourcePos, targetPos});
             setSvgAttributes(path, {
@@ -570,6 +569,8 @@
                 strokeLinecap: 'round',
                 cursor: 'pointer'
             });
+
+            graphLink.rendered = true;
 
             g.appendChild(path);
 
@@ -594,9 +595,7 @@
             
             if(linkType === 'curve'){
                 setSvgAttributes(pathElem, {
-                    d: `M ${targetPos.x} ${targetPos.y} 
-                Q ${targetPos.x} ${(sourcePos.y + targetPos.y)/2}, ${(sourcePos.x + targetPos.x)/2} ${(sourcePos.y + targetPos.y)/2} 
-                T ${sourcePos.x} ${sourcePos.y}`,
+                    d: this.curveto(sourcePos, targetPos),
                     strokeLinejoin: 'round'
                 });
             }
@@ -608,7 +607,54 @@
                 });
             }
         }
-        
+        curveto(sourcePos, targetPos){
+            const { layoutSourceNode, layoutTargetNode } = this;
+            const controllPoints = [
+                targetPos.x, (sourcePos.y + targetPos.y)/2,
+                sourcePos.x, (sourcePos.y + targetPos.y)/2
+            ];
+            let sibling = (Math.abs(layoutSourceNode.info.rowIndex - layoutTargetNode.info.rowIndex) <= 1);
+            
+            //when nodes with same x and isn't sibling row
+            if(sourcePos.x === targetPos.x){
+                let hasRenderedReverseLink = this.hasRenderedReverseLink();
+                let factor = hasRenderedReverseLink? 50:150;
+
+                if(!sibling || hasRenderedReverseLink){
+                    controllPoints[0] = targetPos.x + factor;
+                    controllPoints[1] = targetPos.y + (targetPos.y > sourcePos.y? -factor : factor);
+                    controllPoints[2] = sourcePos.x - factor;
+                    controllPoints[3] = sourcePos.y + (targetPos.y < sourcePos.y? -factor : factor);
+                }
+            }
+
+            //when nodes in the same row
+            if(layoutSourceNode.info.rowIndex === layoutTargetNode.info.rowIndex){
+                let factor1 = 100;
+                controllPoints[0] = targetPos.x;
+                controllPoints[1] = targetPos.y - factor1;
+                controllPoints[2] = sourcePos.x;
+                controllPoints[3] = sourcePos.y + factor1;
+            }
+
+            //when node link to itself
+            if(layoutSourceNode.info.rowIndex === layoutTargetNode.info.rowIndex && layoutSourceNode.info.columnIndex === layoutTargetNode.info.columnIndex){
+                let factor2 = 150;
+                controllPoints[0] = targetPos.x - factor2;
+                controllPoints[1] = targetPos.y - factor2;
+                controllPoints[2] = sourcePos.x - factor2;
+                controllPoints[3] = sourcePos.y + factor2;
+            }
+
+            return `M ${targetPos.x} ${targetPos.y}
+                C ${controllPoints.map(point => (point + ' '))} ${sourcePos.x} ${sourcePos.y}`;
+        }
+        hasRenderedReverseLink(){
+            const { graphLink } = this;
+            const { sourceNode, targetNode } = graphLink;
+
+            return sourceNode.links.target.some(link => (link.rendered && link.targetNode.id === sourceNode.id && link.sourceNode.id === targetNode.id));
+        }
     }
 
     // svg-pan-zoom v3.6.0
@@ -697,6 +743,7 @@
         }
         destroy(){
             this.container.removeChild(this.toolBox);
+            this.panZoomTiger.destroy();
         }
         create(svgStr){
             const svg = document.querySelector(svgStr);
@@ -783,6 +830,9 @@
 
             li.addEventListener('click', () => {
                 this.panZoomTiger[type]();
+                if(type === 'resetZoom'){
+                    this.panZoomTiger.zoomOut();
+                }
             });
 
             li.addEventListener('mouseenter', () => {
@@ -975,8 +1025,10 @@
         }
         setSVGPanZoom(){
             const { svgPanZoomConfig } = this.initOptions;
+            const panZoomTiger = svgPanZoom('#viewport', svgPanZoomConfig);
 
-            return svgPanZoom('#viewport', svgPanZoomConfig);
+            panZoomTiger.zoomOut();
+            return panZoomTiger;
         }
         setToolBox(panZoomTiger){
             const { toolBox } = this.initOptions;
@@ -1086,35 +1138,54 @@
             }, []);
 
             /**find roots */
-            let nodeMap = {};
-            let rootNodes = GraphLinks.filter(link => {
-                let {sourceNode} = link;
-                let inCount = sourceNode.getInCount();
-                if(inCount === 0 && !nodeMap[sourceNode.id]){
-                    nodeMap[sourceNode.id] = sourceNode;
-                    return true;
-                }
-            }).map(link => link.sourceNode);
-
+            let rootNodes = this.findRootNodes(GraphLinks);
             /**layout */
             let layout = this.layout(rootNodes);
 
             layout.build({rowConfig, columnConfig, node});
             layout.render();
         }
+        findRootNodes(GraphLinks){
+            let nodeMap = {};
+            let minInCount = +Infinity;
+            let inCountNodeMap = {};
+
+            GraphLinks.forEach(link => {
+                let { sourceNode } = link;
+                let inCount = sourceNode.getInCount();
+
+                if(nodeMap[sourceNode.id]){
+                    return;
+                }
+
+                if(minInCount > inCount){
+                    minInCount = inCount;
+                }
+
+                if(!inCountNodeMap[inCount]){
+                    inCountNodeMap[inCount] = [];
+                }
+
+                inCountNodeMap[inCount].push(sourceNode);
+                nodeMap[sourceNode.id] = sourceNode;
+            });
+
+            return inCountNodeMap[minInCount];
+        }
         layout(rootNodes){
             /**create tree matrix */
             let matrix = [rootNodes];
-            let layoutNodeMap = {};
-            let { row, pushToNextRow } = this.getRowFromParent({parentNodes: rootNodes, layoutNodeMap});
+            let layoutNodeMap = rootNodes.reduce((prev, node) => {
+                prev[node.id] = node;
+                return prev;
+            }, {});
+            let { row } = this.getRowFromParent({parentNodes: rootNodes, layoutNodeMap});
 
             while(row.length){
                 matrix.push(row);
-                let rowRes = this.getRowFromParent({parentNodes: row, layoutNodeMap, readyForPush: pushToNextRow});
+                let rowRes = this.getRowFromParent({parentNodes: row, layoutNodeMap});
                 row = rowRes.row;
-                pushToNextRow = rowRes.pushToNextRow;
             }
-
             /**create layout with matrix */
             let layout = new Layout({matrix, initOptions: this.initOptions});
 
@@ -1122,7 +1193,7 @@
 
             return layout;
         }
-        getRowFromParent({ parentNodes, layoutNodeMap, readyForPush}){
+        getRowFromParent({ parentNodes, layoutNodeMap}){
             let map = {};
             let row = [];
             let targetMap = {}; //aviod same row node link
@@ -1131,11 +1202,8 @@
                 let parentNode = parentNodes[i];
                 let targetNodes = parentNode.getTargetNodes();
                 
-                if(i === parentNodes.length -1){
-                    targetNodes = targetNodes.concat(readyForPush || []);
-                }
                 targetNodes.forEach(node => {
-                    if(!map[node.id] && !layoutNodeMap[node.id]){
+                    if(!map[node.id] && !layoutNodeMap[node.id] && parentNode.id !== node.id){
                         /**aviod same row node link */
                         targetMap[node.id] = [];
                         node.links.source.forEach(link => {
@@ -1149,28 +1217,7 @@
                 });
             }
             
-            let pushToNextRow = [];
-            for(let i = row.length - 1; i >= 0; i--){
-                let node = row[i];
-                let targetIds = targetMap[node.id];
-                let readyForRemove = [];
-
-                row.every((node, index) => {
-                    let has = targetIds.includes(node.id);
-                    if(has){
-                        pushToNextRow.push(node);
-                        readyForRemove.push(index);
-                    }
-                    return has;
-                });
-
-                readyForRemove.forEach(index => {
-                    delete layoutNodeMap[row[index].id];
-                    row.splice(index, 1);
-                });
-            }
-            
-            return { row, pushToNextRow };
+            return { row };
         }
     }
 

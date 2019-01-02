@@ -23,6 +23,7 @@ class ToolBox {
     }
     destroy(){
         this.container.removeChild(this.toolBox);
+        this.panZoomTiger.destroy();
     }
     create(svgStr){
         const svg = document.querySelector(svgStr);
@@ -109,6 +110,9 @@ class ToolBox {
 
         li.addEventListener('click', () => {
             this.panZoomTiger[type]();
+            if(type === 'resetZoom'){
+                this.panZoomTiger.zoomOut();
+            }
         });
 
         li.addEventListener('mouseenter', () => {
