@@ -692,42 +692,6 @@
     class ToolBox {
         constructor(panZoomTiger){
             this.panZoomTiger = panZoomTiger;
-            this.createCSSText();
-        }
-        createCSSText(){
-            const style = document.createElement('style');
-
-            style.innerHTML = `
-            .graph_toolbox {
-                font-size: 12px;
-                margin: 0;
-                transform: translateY(-100%);
-                padding: 10px;
-            }
-            .graph_toolbox .tooltip {
-                display: flex;
-                width: 100%;
-                align-item: center;
-                justify-content: center;
-            }
-            .graph_toolbox .btn {
-                display: flex;
-                align-items: center;
-                line-height: 32px;
-                position: relative;
-                z-index: 10;
-                width: 32px;
-                height: 32px;
-                cursor: pointer;
-                text-align: center;
-                color: #fff;
-                border: 1px solid #dedede;
-                background: #fff;
-                margin-bottom: 4px;
-            }
-        `;
-
-            document.head.appendChild(style);
         }
         create(svgStr){
             const svg = document.querySelector(svgStr);
@@ -741,17 +705,15 @@
                 position: 'fixed',
                 left: clientRect.left + 'px',
                 top: clientRect.bottom + 'px',
-                transform: 'translateY()'
+                fontSize: '12px',
+                margin: '0',
+                transform: 'translateY(-100%)',
+                padding: '10px'
             });
 
             this.build(zoomInBtn, 'zoomIn');
             this.build(zoomOutBtn, 'zoomOut');
             this.build(resetBtn, 'resetZoom');
-
-            toolBox.className = 'graph_toolbox';
-            zoomInBtn.className = 'btn graph_zoomInBtn';
-            zoomOutBtn.className = 'btn graph_zoomOutBtn';
-            resetBtn.className = 'btn graph_resetBtn';
 
             toolBox.appendChild(zoomInBtn);
             toolBox.appendChild(zoomOutBtn);
@@ -768,7 +730,11 @@
             let icon = document.createElement('span');
 
             icon.innerHTML = Icons[type];
-            icon.className = 'tooltip';
+
+            Object.assign(icon.style, {
+                display: 'flex',
+                alignItems: 'center'
+            });
 
             const tooltip = new ToolTip('node');
             let text = '';
@@ -785,6 +751,23 @@
             default:
                 text = '放大';
             }
+
+            Object.assign(li.style, {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                lineHeight: '32px',
+                position: 'relative',
+                zIndex: '10',
+                width: '32px',
+                height: '32px',
+                cursor: 'pointer',
+                textAlign: 'center',
+                color: '#fff',
+                border: '1px solid #dedede',
+                background: '#fff',
+                marginBottom: '4px'
+            });
 
             li.addEventListener('click', () => {
                 this.panZoomTiger[type]();
