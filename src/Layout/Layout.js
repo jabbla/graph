@@ -190,7 +190,7 @@ class Layout {
             return;
         }
 
-        const Toolbox = new ToolBox(panZoomTiger);
+        const Toolbox = new ToolBox(panZoomTiger, toolBox);
 
         requestAnimationFrame(() => {
             const toolboxElem = Toolbox.create('#viewport');
