@@ -38,10 +38,6 @@ var nodes = [
 
 var links = [
     {
-        source: 'a1',
-        target: 'd'
-    },
-    {
         source: 'a2',
         target: 'd'
     },
@@ -64,6 +60,30 @@ var links = [
     {
         source: 'd',
         target: 'e'
+    },
+    {
+        source: 'e',
+        target: 'a1'
+    },
+    {
+        source: 'a1',
+        target: 'e'
+    },
+    {
+        source: 'd',
+        target: 'b'
+    },
+    {
+        source: 'b',
+        target: 'e'
+    },
+    {
+        source: 'a2',
+        target: 'c'
+    },
+    {
+        source: 'c',
+        target: 'a2'
     }
 ];
 

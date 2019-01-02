@@ -8,13 +8,13 @@ class LayoutLink {
         const { graphLink } = this;
         const { sourceNode, targetNode } = graphLink;
 
-        const layoutSourceNode = layoutNodeMap[sourceNode.id];
-        const layoutTargetNode = layoutNodeMap[targetNode.id]; 
+        this.layoutSourceNode = layoutNodeMap[sourceNode.id];
+        this.layoutTargetNode = layoutNodeMap[targetNode.id]; 
 
         let g = createSvgElement('g');
         let path = createSvgElement('path');
-        let sourcePos = this.getNodePosition(layoutSourceNode).bottomMiddle;
-        let targetPos = this.getNodePosition(layoutTargetNode).topMiddle;
+        let sourcePos = this.getNodePosition(this.layoutSourceNode).bottomMiddle;
+        let targetPos = this.getNodePosition(this.layoutTargetNode).topMiddle;
 
         this.strokeByLineType(path, {sourcePos, targetPos});
         setSvgAttributes(path, {
@@ -30,6 +30,8 @@ class LayoutLink {
             strokeLinecap: 'round',
             cursor: 'pointer'
         });
+
+        graphLink.rendered = true;
 
         g.appendChild(path);
 
@@ -54,9 +56,7 @@ class LayoutLink {
         
         if(linkType === 'curve'){
             setSvgAttributes(pathElem, {
-                d: `M ${targetPos.x} ${targetPos.y} 
-                Q ${targetPos.x} ${(sourcePos.y + targetPos.y)/2}, ${(sourcePos.x + targetPos.x)/2} ${(sourcePos.y + targetPos.y)/2} 
-                T ${sourcePos.x} ${sourcePos.y}`,
+                d: this.curveto(sourcePos, targetPos),
                 strokeLinejoin: 'round'
             });
         }
@@ -68,7 +68,54 @@ class LayoutLink {
             });
         }
     }
-    
+    curveto(sourcePos, targetPos){
+        const { layoutSourceNode, layoutTargetNode } = this;
+        const controllPoints = [
+            targetPos.x, (sourcePos.y + targetPos.y)/2,
+            sourcePos.x, (sourcePos.y + targetPos.y)/2
+        ];
+        let sibling = (Math.abs(layoutSourceNode.info.rowIndex - layoutTargetNode.info.rowIndex) <= 1);
+        
+        //when nodes with same x and isn't sibling row
+        if(sourcePos.x === targetPos.x){
+            let hasRenderedReverseLink = this.hasRenderedReverseLink();
+            let factor = hasRenderedReverseLink? 50:150;
+
+            if(!sibling || hasRenderedReverseLink){
+                controllPoints[0] = targetPos.x + factor;
+                controllPoints[1] = targetPos.y + (targetPos.y > sourcePos.y? -factor : factor);
+                controllPoints[2] = sourcePos.x - factor;
+                controllPoints[3] = sourcePos.y + (targetPos.y < sourcePos.y? -factor : factor);
+            }
+        }
+
+        //when nodes in the same row
+        if(layoutSourceNode.info.rowIndex === layoutTargetNode.info.rowIndex){
+            let factor1 = 100;
+            controllPoints[0] = targetPos.x;
+            controllPoints[1] = targetPos.y - factor1;
+            controllPoints[2] = sourcePos.x;
+            controllPoints[3] = sourcePos.y + factor1;
+        }
+
+        //when node link to itself
+        if(layoutSourceNode.info.rowIndex === layoutTargetNode.info.rowIndex && layoutSourceNode.info.columnIndex === layoutTargetNode.info.columnIndex){
+            let factor2 = 150;
+            controllPoints[0] = targetPos.x - factor2;
+            controllPoints[1] = targetPos.y - factor2;
+            controllPoints[2] = sourcePos.x - factor2;
+            controllPoints[3] = sourcePos.y + factor2;
+        }
+
+        return `M ${targetPos.x} ${targetPos.y}
+                C ${controllPoints.map(point => (point + ' '))} ${sourcePos.x} ${sourcePos.y}`;
+    }
+    hasRenderedReverseLink(){
+        const { graphLink } = this;
+        const { sourceNode, targetNode } = graphLink;
+
+        return sourceNode.links.target.some(link => (link.rendered && link.targetNode.id === sourceNode.id && link.sourceNode.id === targetNode.id));
+    }
 }
 
 export default LayoutLink;

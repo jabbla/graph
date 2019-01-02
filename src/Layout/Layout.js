@@ -181,8 +181,10 @@ class Layout {
     }
     setSVGPanZoom(){
         const { svgPanZoomConfig } = this.initOptions;
+        const panZoomTiger = SVGPanZoom('#viewport', svgPanZoomConfig);
 
-        return SVGPanZoom('#viewport', svgPanZoomConfig);
+        panZoomTiger.zoomOut();
+        return panZoomTiger;
     }
     setToolBox(panZoomTiger){
         const { toolBox } = this.initOptions;

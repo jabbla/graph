@@ -1,7 +1,5 @@
 import { GraphNodeCreator } from './GraphNode';
 
-const linkMap = {};
-
 class GraphLink {
     constructor(linkOption, options){
         let { source, target } = linkOption;
@@ -30,16 +28,19 @@ class GraphLink {
         return Object.assign(defaultLinkConfig, linkConfig || {}, linkOption);
     }
 }
+GraphLink.linkMap = {};
+
+export default GraphLink;
 
 export const GraphLinkCreator = {
     create(linkOption, options){
         let { source, target } = linkOption;
         let id = `${source}#!#@#${target}`;
-        let exist = !!linkMap[id];
-        let link = linkMap[id] || new GraphLink(linkOption, options);
+        let exist = !!GraphLink.linkMap[id];
+        let link = GraphLink.linkMap[id] || new GraphLink(linkOption, options);
 
         if(exist){
-            linkMap[id] = link;
+            GraphLink.linkMap[id] = link;
         }
 
         return {exist, link};
