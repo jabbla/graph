@@ -1,7 +1,7 @@
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
-    (global = global || self, global.bundle = factory());
+    (global = global || self, global.Graph = factory());
 }(this, function () { 'use strict';
 
     class GraphNode {
@@ -1226,8 +1226,6 @@
             return new GraphRenderer(initOptions);
         }
     };
-
-    window.Graph = Graph;
 
     return Graph;
 

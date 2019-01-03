@@ -20,17 +20,17 @@ const outputOptions = [
     {
         file: 'docs/dist/graph.js',
         format: 'umd',
-        name: 'bundle'
+        name: 'Graph'
     },
     {
         file: 'dist/graph.js',
         format: 'umd',
-        name: 'bundle'
+        name: 'Graph'
     },
     {
         file: 'dist/graph.min.js',
         format: 'umd',
-        name: 'bundle'
+        name: 'Graph'
     }
 ]
 
