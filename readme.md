@@ -1,4 +1,5 @@
 ## Graph
+[![npm version](https://badge.fury.io/js/%40jabbla%2Fgraph.svg)](https://badge.fury.io/js/%40jabbla%2Fgraph)
 
 [demo](https://codepen.io/jabbla/pen/XozLaM)
 
