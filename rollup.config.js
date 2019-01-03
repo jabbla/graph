@@ -4,6 +4,6 @@ export default {
     output: {
         file: outputFile,
         format: 'umd',
-        name: 'bundle'
+        name: 'Graph'
     }
 };
