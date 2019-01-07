@@ -149,7 +149,7 @@ class GraphRenderer {
             let parentNode = parentNodes[i];
             let targetNodes = parentNode.getTargetNodes();
             
-            targetNodes.forEach(node => {
+            targetNodes.filter(node => typeof node !== 'undefined').forEach(node => {
                 if(!map[node.id] && !layoutNodeMap[node.id] && parentNode.id !== node.id){
                     /**aviod same row node link */
                     targetMap[node.id] = [];

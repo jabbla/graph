@@ -66,7 +66,13 @@
             this.targetNode = this.buildNode('target', linkOption.target, nodes);
         }
         buildNode(type, nodeId, nodes){
-            let nodeRes = GraphNodeCreator.create(nodes.find(node => node.id === nodeId));
+            let node = nodes.find(node => node.id === nodeId);
+            
+            if(!node){
+                return;
+            }
+
+            let nodeRes = GraphNodeCreator.create(node);
         
             nodeRes.node.addLink(type, this);
             
@@ -385,13 +391,15 @@
             this.nodeRect = nodeRect;
             this.nodeText = nodeText;
             
-            if(graphNode.links.source.length){
+            let sourceLinks = graphNode.links.source.filter(link => link.targetNode);
+            let targetLinks = graphNode.links.target.filter(link => link.sourceNode);
+            if(sourceLinks.length){
                 let nodeStartPoint = this.creatStartPoint();
                 nodeWraper.appendChild(nodeStartPoint);
                 this.nodeStartPoint = nodeStartPoint;
             }
 
-            if(graphNode.links.target.length){
+            if(targetLinks.length){
                 let nodeEndPoint = this.creatEndPoint();
                 nodeWraper.appendChild(nodeEndPoint);
                 this.nodeEndPoint = nodeEndPoint;
@@ -546,6 +554,10 @@
         createElement(layoutNodeMap){
             const { graphLink } = this;
             const { sourceNode, targetNode } = graphLink;
+
+            if(!sourceNode || !targetNode){
+                return;
+            }
 
             this.layoutSourceNode = layoutNodeMap[sourceNode.id];
             this.layoutTargetNode = layoutNodeMap[targetNode.id]; 
@@ -978,7 +990,9 @@
 
             source.forEach(graphLink => {
                 let layoutLink = new LayoutLink(graphLink);
-                linksWraper.appendChild(layoutLink.createElement(Layout.layoutNodeMap));
+                let linkElem = layoutLink.createElement(Layout.layoutNodeMap);
+                
+                linkElem && linksWraper.appendChild(linkElem);
             });
         }
         render(){
@@ -1202,7 +1216,7 @@
                 let parentNode = parentNodes[i];
                 let targetNodes = parentNode.getTargetNodes();
                 
-                targetNodes.forEach(node => {
+                targetNodes.filter(node => typeof node !== 'undefined').forEach(node => {
                     if(!map[node.id] && !layoutNodeMap[node.id] && parentNode.id !== node.id){
                         /**aviod same row node link */
                         targetMap[node.id] = [];

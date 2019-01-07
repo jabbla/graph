@@ -33,6 +33,10 @@ var nodes = [
     {
         id: 'e',
         name: 'e'
+    },
+    {
+        id: 'f',
+        name: 'f'
     }
 ];
 
@@ -84,6 +88,10 @@ var links = [
     {
         source: 'c',
         target: 'a2'
+    },
+    {
+        source: 'f',
+        target: ''
     }
 ];
 
