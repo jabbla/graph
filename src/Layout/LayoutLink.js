@@ -8,6 +8,10 @@ class LayoutLink {
         const { graphLink } = this;
         const { sourceNode, targetNode } = graphLink;
 
+        if(!sourceNode || !targetNode){
+            return;
+        }
+
         this.layoutSourceNode = layoutNodeMap[sourceNode.id];
         this.layoutTargetNode = layoutNodeMap[targetNode.id]; 
 

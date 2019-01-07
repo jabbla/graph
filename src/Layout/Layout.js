@@ -134,7 +134,9 @@ class Layout {
 
         source.forEach(graphLink => {
             let layoutLink = new LayoutLink(graphLink);
-            linksWraper.appendChild(layoutLink.createElement(Layout.layoutNodeMap));
+            let linkElem = layoutLink.createElement(Layout.layoutNodeMap);
+            
+            linkElem && linksWraper.appendChild(linkElem);
         });
     }
     render(){

@@ -49,13 +49,15 @@ class LayoutNode {
         this.nodeRect = nodeRect;
         this.nodeText = nodeText;
         
-        if(graphNode.links.source.length){
+        let sourceLinks = graphNode.links.source.filter(link => link.targetNode);
+        let targetLinks = graphNode.links.target.filter(link => link.sourceNode);
+        if(sourceLinks.length){
             let nodeStartPoint = this.creatStartPoint();
             nodeWraper.appendChild(nodeStartPoint);
             this.nodeStartPoint = nodeStartPoint;
         }
 
-        if(graphNode.links.target.length){
+        if(targetLinks.length){
             let nodeEndPoint = this.creatEndPoint();
             nodeWraper.appendChild(nodeEndPoint);
             this.nodeEndPoint = nodeEndPoint;

@@ -13,7 +13,13 @@ class GraphLink {
         this.targetNode = this.buildNode('target', linkOption.target, nodes);
     }
     buildNode(type, nodeId, nodes){
-        let nodeRes = GraphNodeCreator.create(nodes.find(node => node.id === nodeId));
+        let node = nodes.find(node => node.id === nodeId);
+        
+        if(!node){
+            return;
+        }
+
+        let nodeRes = GraphNodeCreator.create(node);
     
         nodeRes.node.addLink(type, this);
         
