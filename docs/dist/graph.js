@@ -1156,7 +1156,7 @@
             Layout.layoutNodeMap = {};
         }
         destroy(){
-            this.Layout.destroy();
+            this.Layout && this.Layout.destroy();
         }
         build(renderOptions){
             const { 
