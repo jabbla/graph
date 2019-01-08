@@ -8,35 +8,43 @@ var renderer = Graph.init({
 var nodes = [
     {
         id: 'a',
-        name: 'integ_browse_app_midtable_dt_start'
+        name: 'integ_browse_app_midtable_dt_start',
+        column: 'ssss'
     },
     {
         id: 'a1',
         name: 'a1',
+        column: 'ssss'
     },
     {
         id: 'a2',
-        name: 'a2'
+        name: 'a2',
+        column: 'ssss'
     },
     {
         id: 'b',
-        name: 'b'
+        name: 'b',
+        column: 'ssss'
     },
     {
         id: 'c',
-        name: 'c'
+        name: 'c',
+        column: 'ssss'
     },
     {
         id: 'd',
-        name: 'd'
+        name: 'd',
+        column: 'ssss'
     },
     {
         id: 'e',
-        name: 'e'
+        name: 'e',
+        column: 'ssss'
     },
     {
         id: 'f',
-        name: 'f'
+        name: 'f',
+        column: 'ssss'
     }
 ];
 
@@ -100,7 +108,12 @@ var renderOptions =  {
     links,
     linkConfig: {},
     node: {
-        icon: {}
+        icon: {},
+        tooltip: {
+            formatter(node){
+                return `<p>${node.name}</p><p>${node.column}</p>`;
+            }
+        }
     },
     rowConfig: {},
     columnConfig: []

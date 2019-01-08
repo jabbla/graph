@@ -40,6 +40,12 @@ class GraphRenderer {
                 },
                 formatter(node){
                     return textEllipsis(node.name, 20);
+                },
+                tooltip: {
+                    visible: true,
+                    formatter(node){
+                        return node.name;
+                    }
                 }
             }
         };

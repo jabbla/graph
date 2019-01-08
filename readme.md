@@ -3,6 +3,11 @@
 
 [demo](https://codepen.io/jabbla/pen/XozLaM)
 
+### Changelog
+v1.2.3
+
+1. add node toolTip config
+
 ## Basic Usage
 
 ### install
@@ -184,6 +189,23 @@ default formatter will return node.name
     node: {
         formatter(node){
             return node.name; //default
+        }
+    }
+}
+```
+
+**node.tooltip**
+
+node tooltip config
+
+```js
+{
+    node: {
+        tooltip: {
+            visible: true, //default true
+            formatter(nodeOptions){
+                return nodeOptions.name;    //you can also return HTML Text
+            }
         }
     }
 }
