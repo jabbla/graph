@@ -189,6 +189,23 @@ default formatter will return node.name
 }
 ```
 
+**node.tooltip**
+
+node tooltip config
+
+```js
+{
+    node: {
+        tooltip: {
+            visible: true, //default true
+            formatter(nodeOptions){
+                return nodeOptions.name;    //you can also return HTML Text
+            }
+        }
+    }
+}
+```
+
 **node.icon**
 
 specify icon which locate at the left of node-text

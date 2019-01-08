@@ -26,12 +26,12 @@ class ToolTip {
         setElemStyle(this.content, {
             backgroundColor: '#3d3d3d',
             color: '#fff',
-            height: '24px',
             whiteSpace: 'nowrap',
             lineHeight: '24px',
             transform: 'translateX(-50%)',
             padding: '0 10px',
-            borderRadius: '4px'
+            borderRadius: '4px',
+            overflow: 'hidden'
         });
 
         this.elem.appendChild(this.arrow);

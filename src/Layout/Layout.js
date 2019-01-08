@@ -149,14 +149,22 @@ class Layout {
         
         /** node tooltip */
         [...svgDom.querySelectorAll('.nodeWraper')].forEach(nodeWraper => {
+            let { id } = nodeWraper.dataset;
+            let layoutNode = LayoutNode.Nodes[id];
+            let tooltipConfig = layoutNode.nodeConfig.tooltip;
+
+            if(!tooltipConfig.visible){
+                return;
+            }
+
             let tooltip = new ToolTip('node');
             let nodeRect = nodeWraper.querySelector('.nodeRect');
 
             nodeWraper.addEventListener('mouseenter', () => {
-                let { name } = nodeWraper.dataset;
                 let { left, top, width } = nodeRect.getBoundingClientRect();
-                
-                tooltip.show({ left, top, text: name, dx: width/2 });
+                let { formatter } = tooltipConfig;
+                let text = formatter(layoutNode.graphNode.nodeOptions);
+                tooltip.show({ left, top, text, dx: width/2 });
             });
 
             nodeWraper.addEventListener('mouseleave', () => {

@@ -354,6 +354,8 @@
             this.info = info;
             this.globalNodeConfig = globalNodeConfig;
             this.nodeConfig = mergeObject(globalNodeConfig, graphNode.nodeOptions, true);
+
+            LayoutNode.Nodes[graphNode.id] = this;
             
             this.defaultConfig = {
                 width: 200,
@@ -428,15 +430,19 @@
         }
         createWraper(){
             const { width, height, rx, ry } = this.defaultConfig;
-            const { id, name } = this.graphNode;
+            const { id, nodeOptions } = this.graphNode;
 
             let nodeWraper = createSvgElement('g');
-            setSvgAttributes(nodeWraper, {
+            let dataSets = {
+                'data-id': nodeOptions.id,
+                'data-name': nodeOptions.name
+            };
+
+            setSvgAttributes(nodeWraper, Object.assign({
                 id: `nodeWraper_${id}`,
                 class: 'nodeWraper',
-                'data-name': name,
                 width, height, rx, ry
-            });
+            }, dataSets));
 
             return nodeWraper;
         }
@@ -546,6 +552,8 @@
             return g;
         }
     }
+
+    LayoutNode.Nodes = {};
 
     class LayoutLink {
         constructor(graphLink){
@@ -699,12 +707,12 @@
             setElemStyle(this.content, {
                 backgroundColor: '#3d3d3d',
                 color: '#fff',
-                height: '24px',
                 whiteSpace: 'nowrap',
                 lineHeight: '24px',
                 transform: 'translateX(-50%)',
                 padding: '0 10px',
-                borderRadius: '4px'
+                borderRadius: '4px',
+                overflow: 'hidden'
             });
 
             this.elem.appendChild(this.arrow);
@@ -1005,14 +1013,22 @@
             
             /** node tooltip */
             [...svgDom.querySelectorAll('.nodeWraper')].forEach(nodeWraper => {
+                let { id } = nodeWraper.dataset;
+                let layoutNode = LayoutNode.Nodes[id];
+                let tooltipConfig = layoutNode.nodeConfig.tooltip;
+
+                if(!tooltipConfig.visible){
+                    return;
+                }
+
                 let tooltip = new ToolTip('node');
                 let nodeRect = nodeWraper.querySelector('.nodeRect');
 
                 nodeWraper.addEventListener('mouseenter', () => {
-                    let { name } = nodeWraper.dataset;
                     let { left, top, width } = nodeRect.getBoundingClientRect();
-                    
-                    tooltip.show({ left, top, text: name, dx: width/2 });
+                    let { formatter } = tooltipConfig;
+                    let text = formatter(layoutNode.graphNode.nodeOptions);
+                    tooltip.show({ left, top, text, dx: width/2 });
                 });
 
                 nodeWraper.addEventListener('mouseleave', () => {
@@ -1107,6 +1123,12 @@
                     },
                     formatter(node){
                         return textEllipsis(node.name, 20);
+                    },
+                    tooltip: {
+                        visible: true,
+                        formatter(node){
+                            return node.name;
+                        }
                     }
                 }
             };

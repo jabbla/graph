@@ -12,6 +12,8 @@ class LayoutNode {
         this.info = info;
         this.globalNodeConfig = globalNodeConfig;
         this.nodeConfig = mergeObject(globalNodeConfig, graphNode.nodeOptions, true);
+
+        LayoutNode.Nodes[graphNode.id] = this;
         
         this.defaultConfig = {
             width: 200,
@@ -86,15 +88,19 @@ class LayoutNode {
     }
     createWraper(){
         const { width, height, rx, ry } = this.defaultConfig;
-        const { id, name } = this.graphNode;
+        const { id, nodeOptions } = this.graphNode;
 
         let nodeWraper = createSvgElement('g');
-        setSvgAttributes(nodeWraper, {
+        let dataSets = {
+            'data-id': nodeOptions.id,
+            'data-name': nodeOptions.name
+        };
+
+        setSvgAttributes(nodeWraper, Object.assign({
             id: `nodeWraper_${id}`,
             class: 'nodeWraper',
-            'data-name': name,
             width, height, rx, ry
-        });
+        }, dataSets));
 
         return nodeWraper;
     }
@@ -204,5 +210,7 @@ class LayoutNode {
         return g;
     }
 }
+
+LayoutNode.Nodes = {};
 
 export default LayoutNode;
