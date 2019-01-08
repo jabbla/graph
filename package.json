@@ -1,6 +1,6 @@
 {
   "name": "@jabbla/graph",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "javascript svg graph library",
   "main": "./dist/graph.js",
   "directories": {
